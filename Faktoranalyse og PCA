@@ -1,0 +1,57 @@
+##### Factorial analysis section 4 Trust #####
+# PACKAGES
+library(psych)
+library(psychTools)
+library(GPArotation)
+# LOAD DATA
+setwd("C:/Users/magnusb/Filr/My Files/Oppgave/Data spørreundersøkelse/RETTredigert/Arbeidsfil Paper 1")
+Arbeidsfil1 <- read.csv(file="DatasetSpørreundersøkelseSept2019DA.csv",header=T,sep=";")
+describe(Arbeidsfil1)
+headtail(Arbeidsfil1)
+names(Arbeidsfil1)
+# EXTRACT q4
+q4<-Arbeidsfil1[,c("q4_1","q4_2","q4_3","q4_4","q4_5","q4_6","q4_7","q4_8","q4_9","q4_10","q4_11")]
+headtail(q4)
+
+# SHORT EXAMINING OF CORRELATION
+pairs.panels(q4,pch = '.')
+lowerCor(q4)
+cor.plot(q4, numbers = TRUE)
+
+### Factoranalysis
+# maximum likelihood solution
+
+# Minimum Residual solution (minres) 
+fq4 <- fa(q4,3,n.obs = 2110)
+fq4
+
+# principa Axis Factor solution (pa)
+paq4 <- fa(q4, 3, n.obs = 2110, fm = "pa")
+paq4o <- target.rot(f3q4)
+paq4o
+
+# Weighted Least Square solution (wls)
+wlsq4 <- fa(q4,3,n.obs = 2110, fm="wls")
+print(wlsq4,cut=0,digits=3)
+
+# - comment: minres and wls is similar. Plotting them: 
+plot(fq4)
+fa.diagram(fq4)
+plot(wlsq4)
+fa.diagram(wlsq4)
+
+
+
+### PCA 
+p3q4 <- principal(q4, 3, n.obs = 2110, rotate = "Promax") 
+p3q4
+fa.diagram(p3q4)
+
+
+
+### hierarchical and bi-factor solutions
+om.hq4 <- omega(q4, n.obs = 2110, s1 = FALSE)
+op<- par (mfrow=c(1,1))
+om <- omega(q4, n.obs = 2110) 
+
+# CA analysis? 
