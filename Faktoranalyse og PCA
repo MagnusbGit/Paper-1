@@ -19,11 +19,13 @@ lowerCor(q4)
 cor.plot(q4, numbers = TRUE)
 
 ### Factoranalysis
+fq4factana<-factanal(q4, factor = 3) # 
 # maximum likelihood solution
 
 # Minimum Residual solution (minres) 
 fq4 <- fa(q4,3,n.obs = 2110)
 fq4
+
 
 # principa Axis Factor solution (pa)
 paq4 <- fa(q4, 3, n.obs = 2110, fm = "pa")
@@ -47,6 +49,17 @@ p3q4 <- principal(q4, 3, n.obs = 2110, rotate = "Promax")
 p3q4
 fa.diagram(p3q4)
 
+# another way to do PCA analysis
+pca1 <- princomp(q4, scores = TRUE, cor = TRUE)
+summary(pca1)  # comp.1 exlains more than 50 % of the variance. 
+
+# loadings of principal components
+loadings(pca1) # the loadings are very even between the variables. Thus all are needed to make up comp.1, right?
+#that is not helpful. What does that tell us about the data? 
+# scree plot of eigenvalues
+par(mfrow=c(1,1))
+plot(pca1)
+screeplot(pca1,type = "line")
 
 
 ### hierarchical and bi-factor solutions
