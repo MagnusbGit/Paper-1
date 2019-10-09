@@ -3,7 +3,6 @@
 ###################
 
 #importing data
-urban_data<-read.csv("//ninsrvlil/kim.magnus.barum/My Documents/DIV NINA/Levering del 2/Levering del 2/rawdata_labels.csv",header=T,sep=";",dec = "," ,na.strings = "")
 
 setwd("C:/Users/magnusb/Filr/My Files/Oppgave/Data spørreundersøkelse/RETTredigert/Arbeidsfil Paper 1")
 urban_data <- read.csv(file="DatasetSpørreundersøkelseOkt2019.csv",header=T,sep=";")
