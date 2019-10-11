@@ -67,4 +67,14 @@ om.hq4 <- omega(q4, n.obs = 2110, s1 = FALSE)
 op<- par (mfrow=c(1,1))
 om <- omega(q4, n.obs = 2110) 
 
-# CA analysis? 
+# CA analysis - Item Cluster ANalysis: iclust
+ic <- iclust(q4) # pearson correlation 
+# above: gives different "relationships" than FA and PCA. 
+summary (ic)
+
+
+r.poly <- polychoric(q4)
+head(r.poly)
+ic.poly <- iclust(r.poly$rho,title="ICLUST polychoric clusters")# polychoric correlation instead of pearson
+ic.poly <- iclust(r.poly$rho,5,title="ICLUST polychoric for 5 clusters")# 
+ic.poly <- iclust(r.poly$rho,beta.size=3,title="ICLUST beta.size=3")

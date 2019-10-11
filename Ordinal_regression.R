@@ -1,8 +1,9 @@
+
 # Ordinal regression (proportional odds logistic regression - for multi-class ordered variables)
 
-#setwd("C:/Users/magnusb/Filr/My Files/Oppgave/Data spørreundersøkelse/RETTredigert/Arbeidsfil Paper 1")
-mydata <-read.csv("~/DIV NINA/DatasetSpørreundersøkelseSept2019.csv",header=T,sep=";",dec = "," ,na.strings = "")
-  #read.csv(file="DatasetSpørreundersøkelseOkt2019.csv",header=T,sep=";")
+#setwd("C:/Users/magnusb/Filr/My Files/Oppgave/Data spï¿½rreundersï¿½kelse/RETTredigert/Arbeidsfil Paper 1")
+mydata <-read.csv("~/DIV NINA/DatasetSpï¿½rreundersï¿½kelseSept2019.csv",header=T,sep=";",dec = "," ,na.strings = "")
+  #read.csv(file="DatasetSpï¿½rreundersï¿½kelseOkt2019.csv",header=T,sep=";")
 
 
 
@@ -12,27 +13,27 @@ str(mydata$q4_10)
 # making factors and ordered factors
 
 mydata$q4_10 <- as.ordered(mydata$q4_10)
-mydata$Kjønn <- as.factor(mydata$Kjønn)
-mydata$q3_1b <- as.ordered(mydata$q3_1b) # obs! 4 betyr vet ikke. Skal den fjernes/endres? hvordan? OG kan vi bruke rank-deficient variables? får warning message. 
+mydata$Kjï¿½nn <- as.factor(mydata$Kjï¿½nn)
+mydata$q3_1b <- as.ordered(mydata$q3_1b) # obs! 4 betyr vet ikke. Skal den fjernes/endres? hvordan? OG kan vi bruke rank-deficient variables? fï¿½r warning message. 
 mydata$q2_6.5 <- as.factor(mydata$q2_6.5)
 mydata$q2_7.5 <- as.factor(mydata$q2_7.5)
 mydata$q2_10 <- as.ordered(mydata$q2_10)
 mydata$AntallRartZone <- as.factor(mydata$AntallRartZone)
-mydata$AntallRArterF <- as.factor(mydata$AntallRArterF) # Endret til hva som så ut til å være en gruppert versjon av variablen?
+mydata$AntallRArterF <- as.factor(mydata$AntallRArterF) # Endret til hva som sï¿½ ut til ï¿½ vï¿½re en gruppert versjon av variablen?
 #mydata$Antallarter <- as.factor(mydata$Antallarter)
 mydata$q3_1b[mydata$q3_1b==4] <- NA # does this work? 
 is.na(mydata$q3_1b)
 
 # do this with all variables of interest. Maybe extracting interesting variables first? 
 # running model with more variables 
-#variable <- c("Folkemengde", "BefTetthetKommune","q2_6","q2_7","q2_10","Sum.felt.hjortedyr","SausluppetFylke","Tapt.saulam.fylke","Saulamtapprosent.F","Felt.HjortElg.K", "Bearzone","Wolfzone","Wolverinezone", "Lynxzone","AntallRartZone", "bjørn","gaupe","jerv","ulv","Antallarter","ArtTilstede")
-# spørsmål om en rekke variabler. 
+#variable <- c("Folkemengde", "BefTetthetKommune","q2_6","q2_7","q2_10","Sum.felt.hjortedyr","SausluppetFylke","Tapt.saulam.fylke","Saulamtapprosent.F","Felt.HjortElg.K", "Bearzone","Wolfzone","Wolverinezone", "Lynxzone","AntallRartZone", "bjï¿½rn","gaupe","jerv","ulv","Antallarter","ArtTilstede")
+# spï¿½rsmï¿½l om en rekke variabler. 
 
-# Partition data - ser at man gjør dette, og forstår hvorfor, men kan vi gjøre det her? 
-# hvordan blir det f.eks. når man har 5 fra hver kommune og tar bare 80 % ut uten å ta hensy til dette? 
+# Partition data - ser at man gjï¿½r dette, og forstï¿½r hvorfor, men kan vi gjï¿½re det her? 
+# hvordan blir det f.eks. nï¿½r man har 5 fra hver kommune og tar bare 80 % ut uten ï¿½ ta hensy til dette? 
 
-#Det er et poeng for å validere modellen, men tror vi kjører all data inn i modelleringen her siden vi ikke har så mye data i utgangspunktet. Vi måtte isåfall ha gjort et utvalg innenfor hver kommune ja (om vi tenker at respondentene har en nøstet i kommune). 
-# Det kan i såfall enkelt gjøres ved å kjøre funksjonen i linje 37 i en loop som indekserer på kommune.
+#Det er et poeng for ï¿½ validere modellen, men tror vi kjï¿½rer all data inn i modelleringen her siden vi ikke har sï¿½ mye data i utgangspunktet. Vi mï¿½tte isï¿½fall ha gjort et utvalg innenfor hver kommune ja (om vi tenker at respondentene har en nï¿½stet i kommune). 
+# Det kan i sï¿½fall enkelt gjï¿½res ved ï¿½ kjï¿½re funksjonen i linje 37 i en loop som indekserer pï¿½ kommune.
 
 ind <- sample(2, nrow(mydata), replace = TRUE, prob = c(0.8,0.2))
 train <- mydata[ind==1,]
@@ -40,19 +41,19 @@ test <- mydata[ind==2,]
 
 # The model - MASS
 library(MASS)
-#legger til alle variabler vi ønsker å teste
+#legger til alle variabler vi ï¿½nsker ï¿½ teste
 
-# Tenker det er greit å bruke AIC som modelseleksjonskriterie her, kjenner du til gangen i det, eller skal jeg sette opp for deg?
+# Tenker det er greit ï¿½ bruke AIC som modelseleksjonskriterie her, kjenner du til gangen i det, eller skal jeg sette opp for deg?
 
-m1 <- polr(q4_10~ Alder + Kjønn  + Folkemengde + BefTetthetKommune + Sum.felt.hjortedyr + SausluppetFylke + AntallRartZone + Wolfzone + AntallRArterF + ArtTilstede, train, Hess=TRUE) # Var flere av variablene her som ikke fantes i data jeg bruker, er de lagd utenom R?
-# Tester variabler for å se hvilke som ikke fungerer                               
-m1a <- polr(q4_10~ Alder + Kjønn + Folkemengde+  BefTetthetKommune, train, Hess=TRUE) # Folkemengde fungerer ikke - får feilmelding på summary.  
-m1b <- polr(q4_10~ Alder + Kjønn +BefTetthetKommune + Sum.felt.hjortedyr+ AntallRartZone+ Wolfzone + Antallarter + ArtTilstede, train, Hess=TRUE) # Inkludering av Sum.felt.hjortedyr gir warning message  
-m1c <- polr(q4_10~ Alder + Kjønn + q3_1b + q2_6.5 + q2_7.5 + q2_10 + BefTetthetKommune + Sum.felt.hjortedyr+ AntallRartZone+ Wolfzone + Antallarter + ArtTilstede, train, Hess=TRUE) # Inkludering av Sum.felt.hjortedyr gir warning message  + får warning message design appears to be rank-deficient, so dropping some coefs
+m1 <- polr(q4_10~ Alder + Kjï¿½nn  + Folkemengde + BefTetthetKommune + Sum.felt.hjortedyr + SausluppetFylke + AntallRartZone + Wolfzone + AntallRArterF + ArtTilstede, train, Hess=TRUE) # Var flere av variablene her som ikke fantes i data jeg bruker, er de lagd utenom R?
+# Tester variabler for ï¿½ se hvilke som ikke fungerer                               
+m1a <- polr(q4_10~ Alder + Kjï¿½nn + Folkemengde+  BefTetthetKommune, train, Hess=TRUE) # Folkemengde fungerer ikke - fï¿½r feilmelding pï¿½ summary.  
+m1b <- polr(q4_10~ Alder + Kjï¿½nn +BefTetthetKommune + Sum.felt.hjortedyr+ AntallRartZone+ Wolfzone + Antallarter + ArtTilstede, train, Hess=TRUE) # Inkludering av Sum.felt.hjortedyr gir warning message  
+m1c <- polr(q4_10~ Alder + Kjï¿½nn + q3_1b + q2_6.5 + q2_7.5 + q2_10 + BefTetthetKommune + Sum.felt.hjortedyr+ AntallRartZone+ Wolfzone + Antallarter + ArtTilstede, train, Hess=TRUE) # Inkludering av Sum.felt.hjortedyr gir warning message  + fï¿½r warning message design appears to be rank-deficient, so dropping some coefs
 summary(m1)
 
 
-# next steps - har ikke sett på dette ennå. 
+# next steps - har ikke sett pï¿½ dette ennï¿½. 
 # p-value
 m1.coef <- data.frame(coef(summary(m1)))
 m1.coef$pval = round((pnorm(abs(m1.coef$t.value), lower.tail = FALSE) * 2),2)
@@ -62,7 +63,7 @@ m1.coef
 pred <- predict(m1, train[1:5,], type="prob")
 print(pred, digits = 3)
 
-## Andre ting jeg ikke har sett på ennå 
+## Andre ting jeg ikke har sett pï¿½ ennï¿½ 
 #install.packages("stargazer") ? 
 #library(stargazer)
 #stargazer(m1, type="html", out="m1.htm")
@@ -72,4 +73,5 @@ print(pred, digits = 3)
 
 # visualising # 
 
-# Hvilke visulariseringsprogrammer pleier du å bruke? ggplot?
+# Hvilke visulariseringsprogrammer pleier du ï¿½ bruke? ggplot?
+

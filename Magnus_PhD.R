@@ -1,7 +1,7 @@
 ###############################
 # Cluster analysis Magnus-PHD #
 ###############################
-##importerer pakker (bare eksempel på hvordan du kan instalere mange pakker på en gang ved behov, egentlig unødvendig her med bare 3 pakker...)
+##importerer pakker (bare eksempel p? hvordan du kan instalere mange pakker p? en gang ved behov, egentlig un?dvendig her med bare 3 pakker...)
 if (!require('devtools', character.only=T, quietly=T)) {
   # Requires OpenSSL on the system
   install.packages('devtools')
@@ -25,16 +25,16 @@ for (p in req_packages) {
 }
 libraries(req_packages[1:length(req_packages)])
 
+setwd("C:/Users/magnusb/Filr/My Files/Oppgave/Data spÃ¸rreundersÃ¸kelse/RETTredigert/Arbeidsfil Paper 1")
+df <- read.csv(file="DatasetSpÃ¸rreundersÃ¸kelseOkt2019.csv",header=T,sep=";")
 
 ## Importerer data
-df<-read.csv("~/DIV NINA/DatasetSpørreundersøkelseSept2019.csv",header=T,sep=";",dec = "," ,na.strings = "")
-
 # Velger ut bare kolonner av interesse for dette (dvs spm 4 for enkelhet skyld)
 spm4<-c("RESPID","q4_1","q4_2","q4_3","q4_4","q4_5","q4_6","q4_7","q4_8","q4_9","q4_10", "q4_11")
 df_spm4<-df[,spm4]
 
-# K-means clustering, en maskinlæringsprosess som prøver å tilegne objekter (her folk) i forskjellige grupper med bakgrunn i hva de har svart.
-#Dette gjør den ved at den velger tilfeldig objekter som skal stå i senter i de forskjellige gruppene
+# K-means clustering, en maskinl?ringsprosess som pr?ver ? tilegne objekter (her folk) i forskjellige grupper med bakgrunn i hva de har svart.
+#Dette gj?r den ved at den velger tilfeldig objekter som skal st? i senter i de forskjellige gruppene
 k2 <- kmeans(df_spm4, centers = 2, nstart = 25)
 k3 <- kmeans(df_spm4, centers = 3, nstart = 25)
 k4 <- kmeans(df_spm4, centers = 4, nstart = 25)
@@ -77,7 +77,7 @@ gap_stat <- clusGap(df_spm4, FUN = kmeans, nstart = 25,
                     K.max = 15, B = 50)
 fviz_gap_stat(gap_stat)
 
-# Som du ser så er det ikke noen klare clustere her, det ser ut som det er for stor variasjon innenfor gruppene til at det er tydelige forskjeller opp til 15 grupper. 
+# Som du ser s? er det ikke noen klare clustere her, det ser ut som det er for stor variasjon innenfor gruppene til at det er tydelige forskjeller opp til 15 grupper. 
 
 
 
