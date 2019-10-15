@@ -3,7 +3,7 @@
 ###################
 
 #importing data
-
+#urban_data<-read.csv("//ninsrvlil/kim.magnus.barum/My Documents/DIV NINA/Levering del 2/Levering del 2/rawdata_labels.csv",header=T,sep=";",dec = "," ,na.strings = "")
 setwd("C:/Users/magnusb/Filr/My Files/Oppgave/Data spørreundersøkelse/RETTredigert/Arbeidsfil Paper 1")
 urban_data <- read.csv(file="DatasetSpørreundersøkelseOkt2019.csv",header=T,sep=";")
 
@@ -77,14 +77,28 @@ library(ggplot2)
 library(gridExtra)
 library(ggpubr)
 
-variable<-c("q9_1" , "q9_2", "q9_3", "q9_4","q9_5","q9_6","q9_7","q9_8","q9_9","q9_10","q9_11","q9_12","q9_13","q9_14","q9_15","q9x1_16","q9x1_17","q9x1_18","q9x1_19","q9x1_20","q9x1_21","q9x1_22","q9x1_23","q9x1_24","q9x1_25","q9x1_26","q9x1_27","q9x1_28","q9x1_29","q9x1_30","q9x1_31")
-for (i in levels(factor(variable))){
-i<-noquote(i)
-  print(ggplot(urban_data, aes(x = factor(q10_1), y = i)) +
-  geom_boxplot(size = .75) +
-  geom_jitter(alpha = .5)) 
-}
+#variable<-c("q9_1" , "q9_2", "q9_3", "q9_4","q9_5","q9_6","q9_7","q9_8","q9_9","q9_10","q9_11","q9_12","q9_13","q9_14","q9_15","q9x1_16","q9x1_17","q9x1_18","q9x1_19","q9x1_20","q9x1_21","q9x1_22","q9x1_23","q9x1_24","q9x1_25","q9x1_26","q9x1_27","q9x1_28","q9x1_29","q9x1_30","q9x1_31")
+#for (i in levels(factor(variable))){
+#i<-noquote(i)
+#  print(ggplot(urban_data, aes(x = factor(q10_1), y = i)) +
+#  geom_boxplot(size = .75) +
+#  geom_jitter(alpha = .5)) 
+#}
   
+names(urban_data)
+variable <- c("Folkemengde", "BefTetthetKommune","q2_6","q2_7","q2_10","Sum.felt.hjortedyr","SausluppetFylke","Tapt.saulam.fylke","Saulamtapprosent.F","Felt.HjortElg.K", "Bearzone","Wolfzone","Wolverinezone", "Lynxzone","AntallRartZone", "bjørn","gaupe","jerv","ulv","Antallarter","ArtTilstede")
+variable <- c("q2_6","q2_7","q2_10", "Bearzone","Wolfzone","Wolverinezone", "Lynxzone","AntallRartZone", "bjørn","gaupe","jerv","ulv","Antallarter","ArtTilstede")
+
+str(variable)
+#variable<-c("q9_1" , "q9_2", "q9_3", "q9_4","q9_5","q9_6","q9_7","q9_8","q9_9","q9_10","q9_11","q9_12","q9_13","q9_14","q9_15","q9x1_16","q9x1_17","q9x1_18","q9x1_19","q9x1_20","q9x1_21","q9x1_22","q9x1_23","q9x1_24","q9x1_25","q9x1_26","q9x1_27","q9x1_28","q9x1_29","q9x1_30","q9x1_31")
+for (i in levels(factor(variable))){
+  i<-noquote(i)
+  print(ggplot(urban_data, aes(x = factor(q4_10), y = i)) +
+          geom_boxplot(size = .75) +
+          geom_jitter(alpha = .5)) 
+}
+
+
 
 plot_exp <- 
   function(i){
@@ -253,6 +267,9 @@ global_mod10_1 <- polr(factor(q10_1) ~ q9_1 + q9_2+ q9_3+ q9_4+q9_5+q9_6+q9_7+q9
 (ctable <- coef(summary(global_mod10_1)))
 p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
 
+
+
+
 ## combined table
 (ctable <- cbind(ctable, "p value" = p))
 
@@ -310,3 +327,10 @@ AIC(global_mod10_1,mod10_1.1)
 
 options(na.action = "na.fail")
 final_mod<-dredge(global_mod10_1, evaluate=T, rank="AIC")
+
+
+
+
+
+
+
