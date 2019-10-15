@@ -103,6 +103,65 @@ ggplot(data = tab_q8_3Inntekt, mapping = aes(x = tab_q8_3Inntekt$q8_3Inntekt, y 
   scale_x_discrete(limits = c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","98","99")) # Labels layer omitted
 
 
+# Mulig det ikke er helt det du var ute etter her, men legger det inn som et ekempel på hvordan man kan forenkle litt (og jobbe på samme datasett):
+ggplot(Arbeidsfil1, aes(Innbyggertallgruppe)) + 
+  geom_bar(aes(y = (..count..)/sum(..count..))) + 
+  scale_y_continuous(labels=scales::percent) +
+  ylab("Svarprosent?")+
+  scale_x_discrete(limits = c("-2499","2500-4900","5000-9999","10000-24999","25000-49999","50000-99999","10000+")) #10000+ mangler en null, og bør kanskje stå 1-2499 på første kattegori?
+
+#Eventuelt hvis du også vil se fordeling mtp feks kjønn med det samme
+ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = Kjønn)) + 
+  geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(Kjønn)), stat="count") + 
+  scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
+  scale_x_discrete(limits = c("-2499","2500-4900","5000-9999","10000-24999","25000-49999","50000-99999","10000+"))+ #10000+ mangler en null, og bør kanskje stå 1-2499 på første kattegori?
+  scale_fill_discrete(name = "Kjønn", labels = c("Menn", "Kvinner"))+#sjekk om det ble riktig
+  labs(y = "Prosent")+
+  theme( #ksempler på å "pynte" litt
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_blank()
+    ,legend.title = element_text(size=14, face="bold")
+    ,legend.text = element_text(size=14)
+    ,axis.title.x=element_text(size=14) #kan gjøre det samme for y også, samt for tallene på aksen
+  )+
+  theme(axis.line = element_line(color = 'black'))
+
+#Samme for lønnstrinn
+ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = q8_3Inntekt)) + 
+  geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(q8_3Inntekt)), stat="count") + 
+  scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
+  scale_x_discrete(limits = c("-2499","2500-4900","5000-9999","10000-24999","25000-49999","50000-99999","10000+"))+ #10000+ mangler en null, og bør kanskje stå 1-2499 på første kattegori?
+  scale_fill_discrete(name = "Inntekt")+
+  labs(y = "Prosent")+
+  theme( #ksempler på å "pynte" litt
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_blank()
+    ,legend.title = element_text(size=14, face="bold")
+    ,legend.text = element_text(size=14)
+    ,axis.title.x=element_text(size=14) #kan gjøre det samme for y også, samt for tallene på aksen
+  )+
+  theme(axis.line = element_line(color = 'black'))
+
+#eller forenklet
+ggplot(Arbeidsfil1, aes(factor(q8_3Inntekt))) + 
+  geom_bar(aes(y = (..count..)/sum(..count..))) + 
+  scale_y_continuous(labels=scales::percent) +
+  ylab("Prosent")+
+  theme( #ksempler på å "pynte" litt
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_rect(fill=NA,linetype = "dashed", colour = "black")
+    ,axis.title.y=element_text(size=14) #kan gjøre det samme for x også, samt for tallene på aksen
+  )+
+  theme(axis.line = element_line(color = 'black'))
+
+
+
 #str(Arbeidsfil1$q8_3Inntekt)
 #unique(Arbeidsfil1$q8_3Inntekt)
 #Arbeidsfil1$q8_3Inntekt <- factor(Arbeidsfil1$q8_3Inntekt, levels = c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","98","99"))
