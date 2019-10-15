@@ -132,3 +132,7 @@ drop1(m1a) # naar jeg bruker type="F" saa faar jeg feilmelding. Hva gjoer jeg me
 # bruke Hmsic for aa sjekke proportion odds assumption? 
 
 
+
+
+
+

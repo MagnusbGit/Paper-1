@@ -7,7 +7,7 @@ library(grid)
 library(nnet)
 library(coin)
 library(boot)
-library(simpleboot) # NO
+#library(simpleboot) # NO
 library(knitr)
 library(ggplot2)
 library(dplyr)
@@ -34,7 +34,7 @@ library(sqldf)
 setwd("C:/Users/magnusb/Filr/My Files/Oppgave/Data spørreundersøkelse/RETTredigert/Arbeidsfil Paper 1")
 Arbeidsfil1 <- read.csv(file="DatasetSpørreundersøkelseOkt2019.csv",header=T,sep=";")
 head(Arbeidsfil1)
-attach(Arbeidsfil1)
+#attach(Arbeidsfil1)
 names(Arbeidsfil1)
 detach(package:Hmisc)
 
@@ -111,19 +111,20 @@ ggplot(data = tab_q8_3Inntekt, mapping = aes(x = tab_q8_3Inntekt$q8_3Inntekt, y 
 
 #positionsI <- c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","98","99")
 # Oversikt Aldersgrupe
-tab_Aldersgruppe <- Arbeidsfil1 %>%
-  group_by(Aldersgruppe) %>%
-  summarize(Freq = n()) %>%
-  mutate(Prop = Freq/sum(Freq)) %>%
-  arrange(desc(Prop))
-tab_Aldersgruppe
+#names(Arbeidsfil1)
+#tab_Aldersgruppe <- Arbeidsfil1 %>%
+#  group_by(Aldersgruppe) %>%
+#  summarize(Freq = n()) %>%
+#  mutate(Prop = Freq/sum(Freq)) %>%
+#  arrange(desc(Prop))
+#tab_Aldersgruppe
 
-positions <- c("80+", "67-79", "50-66","30-49","15-29") # to specify the order of the bars in the plot
+#positions <- c("80+", "67-79", "50-66","30-49","15-29") # to specify the order of the bars in the plot
 #p <- ggplot(theTable, aes(x = Position)) + scale_x_discrete(limits = positions)
-ggplot(data = tab_Aldersgruppe, mapping = aes(x = Aldersgruppe, y = Prop)) + 
-  geom_col() + 
-  coord_flip() + 
-  scale_x_discrete(limits = positions) # Labels layer omitted
+#ggplot(data = tab_Aldersgruppe, mapping = aes(x = Aldersgruppe, y = Prop)) + 
+#  geom_col() + 
+#  coord_flip() + 
+#  scale_x_discrete(limits = positions) # Labels layer omitted
 
 
 ##### 
@@ -131,7 +132,7 @@ ggplot(data = tab_Aldersgruppe, mapping = aes(x = Aldersgruppe, y = Prop)) +
 #####
 
 
-# boxplot - Tillit sp?rsm?l q4_1, q4_4, q4_5 og q4_10
+# boxplot - Tillit sp?rsm?l q4_1, q4_4, q4_5 og q4_10 - ikke veldig informativ - forslag til endring? bare droppe boxplot kanskje. 
 b_q4_1 <- Arbeidsfil1$q4_1
 b_q4_4 <- Arbeidsfil1$q4_4
 b_q4_5 <- Arbeidsfil1$q4_5
@@ -216,18 +217,18 @@ PtestdataKjønn[2:7] <- lapply(PtestdataKjønn[2:7], factor, levels = 1:5)
 PtestdataKjønn$Sex<-factor(PtestdataKjønn$Kjønn, levels=c("1","2"))
 str(PtestdataKjønn)
 both_PtestdataKjønn_likert = likert(PtestdataKjønn[, c(2:7), drop = FALSE], grouping = PtestdataKjønn$Kjønn)
-plot(both_PtestdataKjønn_likert, include.histogram = TRUE)
+plot(both_PtestdataKjønn_likert, include.histogram = TRUE) # SPM: hvordan endrer jeg rekkefølgen på spørsmålene? nå kommer de helt rart. 
 
 # alder
-names(Arbeidsfil1)
-levels(Arbeidsfil1$Aldersgruppe)
-PtestdataAldersgruppe <- Arbeidsfil1[,c("Aldersgruppe","q4_1","q4_2","q4_3","q4_6","q4_7","q4_10","q4_11")]
-PtestdataAldersgruppe[2:8] <- lapply(PtestdataAldersgruppe[2:8], factor, levels = 1:5)
-PtestdataSex$Aldersgruppe<-factor(PtestdataSex$Aldersgruppe)
-str(PtestdataAldersgruppe)
-# levels=c("15-29","30-49","50-66","67-79","80+")
-both_PtestdataAldersgruppe_likert = likert(PtestdataAldersgruppe[, c(2:8), drop = FALSE], grouping = PtestdataAldersgruppe$Aldersgruppe)
-plot(both_PtestdataAldersgruppe_likert, include.histogram = TRUE)
+#names(Arbeidsfil1)
+#levels(Arbeidsfil1$Aldersgruppe)
+#PtestdataAldersgruppe <- Arbeidsfil1[,c("Aldersgruppe","q4_1","q4_2","q4_3","q4_6","q4_7","q4_10","q4_11")]
+#PtestdataAldersgruppe[2:8] <- lapply(PtestdataAldersgruppe[2:8], factor, levels = 1:5)
+#PtestdataSex$Aldersgruppe<-factor(PtestdataSex$Aldersgruppe)
+#str(PtestdataAldersgruppe)
+## levels=c("15-29","30-49","50-66","67-79","80+")
+#both_PtestdataAldersgruppe_likert = likert(PtestdataAldersgruppe[, c(2:8), drop = FALSE], grouping = PtestdataAldersgruppe$Aldersgruppe)
+#plot(both_PtestdataAldersgruppe_likert, include.histogram = TRUE)
 
 # Related to number of carnivore species zones
 #PtestdataSex <- Arbeidsfil1[,c("Sex","q4_1","q4_2","q4_3","q4_4","q4_5","q4_6","q4_7","q4_8","q4_9","q4_10","q4_11")]
