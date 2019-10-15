@@ -132,7 +132,34 @@ drop1(m1a) # naar jeg bruker type="F" saa faar jeg feilmelding. Hva gjoer jeg me
 # bruke Hmsic for aa sjekke proportion odds assumption? 
 
 
-
+# NEP - reverse values and calculate mean. Median to? 
+names(mydata)
+NEP<-mydata[,c("RESPID","q6_1","q6_2","q6_3","q6_4","q6_5","q6_6","q6_7")]
+head(NEP)
+# OBS! reverse 3, 5 and 7! 
+NEP2<-NEP[2:8]
+keys <- c(1,1,-1,1,-1,1,-1)  #reverse the 3rd, 5th and 7th items
+new <- reverse.code(keys,NEP2,mini=rep(1,7),maxi=rep(5,7))
+NEP3<-cbind(NEP2,new)
+NEP3<-NEP3[,8:14]
+head(NEP)
+NEP<-NEP[,1]
+NEP<-cbind(NEP6,NEP3)
+head(NEP)
+# rename columns that have been reversed
+names(NEP)[names(NEP) == "NEP"] <- "RESPID"
+names(NEP)[names(NEP) == "q6_3-"] <- "q6_3"
+names(NEP)[names(NEP) == "q6_5-"] <- "q6_5"
+names(NEP)[names(NEP) == "q6_7-"] <- "q6_7"
+# make average and median
+NEP$average <- rowMeans(NEP[2:8], na.rm=TRUE)
+NEP$average <- format(NEP$average,digits = 3)
+NEP2<-NEP %>% 
+  rowwise() %>% 
+  mutate(median = median(c(q6_1, q6_2, q6_3,q6_4,q6_5,q6_6,q6_7), na.rm = FALSE))
+NEP4<-NEP2[,10]
+NEP<- cbind(NEP,NEP4)
+head(NEP)
 
 
 
