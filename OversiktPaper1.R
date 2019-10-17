@@ -34,14 +34,18 @@ library(sqldf)
 setwd("C:/Users/magnusb/Filr/My Files/Oppgave/Data spørreundersøkelse/RETTredigert/Arbeidsfil Paper 1")
 Arbeidsfil1 <- read.csv(file="DatasetSpørreundersøkelseOkt2019.csv",header=T,sep=";")
 head(Arbeidsfil1)
-#attach(Arbeidsfil1)
-names(Arbeidsfil1)
-detach(package:Hmisc)
+
+# Fix mistakes in Arbeidsfil1$Innbyggertallgruppe
+Arbeidsfil1$Innbyggertallgruppe <- as.character(Arbeidsfil1$Innbyggertallgruppe)
+Arbeidsfil1$Innbyggertallgruppe[Arbeidsfil1$Innbyggertallgruppe == "10000+"] <- "100000+"
+Arbeidsfil1$Innbyggertallgruppe[Arbeidsfil1$Innbyggertallgruppe == "-2499"] <- "0-2499"
+Arbeidsfil1$Innbyggertallgruppe <- factor(Arbeidsfil1$Innbyggertallgruppe,levels=c("0-2499", "2500-4900","10000-24999", "25000-49999", "5000-9999", "50000-99999", "100000+"))
 
 
 ######                                    ######
 # OVersikt over demografi og økonomi #
 ######                                    ######
+detach(package:Hmisc)
 # Oversikt innbyggertallgruppe
 tab_innbyggertallgruppe <- Arbeidsfil1 %>%
   group_by(Innbyggertallgruppe) %>%
@@ -92,8 +96,6 @@ tab_q8_3Inntekt <- Arbeidsfil1 %>%
   arrange(desc(Prop))
 tab_q8_3Inntekt
 
-str(Arbeidsfil1)  
-str(Arbeidsfil1$q8_3Inntekt)
 unique(Arbeidsfil1$q8_3Inntekt)
 tab_q8_3Inntekt$q8_3Inntekt<- factor(tab_q8_3Inntekt$q8_3Inntekt, levels =c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","98","99"))
 
