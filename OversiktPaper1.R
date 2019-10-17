@@ -109,14 +109,48 @@ ggplot(data = tab_q8_3Inntekt, mapping = aes(x = tab_q8_3Inntekt$q8_3Inntekt, y 
 ggplot(Arbeidsfil1, aes(Innbyggertallgruppe)) + 
   geom_bar(aes(y = (..count..)/sum(..count..))) + 
   scale_y_continuous(labels=scales::percent) +
-  ylab("Svarprosent?")+
-  scale_x_discrete(limits = c("-2499","2500-4900","5000-9999","10000-24999","25000-49999","50000-99999","10000+")) #10000+ mangler en null, og bør kanskje stå 1-2499 på første kattegori?
+  ylab("Prosent")+
+  scale_x_discrete(limits = c("0-2499","2500-4900","5000-9999","10000-24999","25000-49999","50000-99999","100000+")) 
 
+str(Arbeidsfil1$ArtTilstede)
+table(Arbeidsfil1$ArtTilstede)
+
+# ArtTilstede
+names(Arbeidsfil1)
+str(Arbeidsfil1$ArtTilstede)
+ggplot(Arbeidsfil1, aes(ArtTilstede)) + 
+  geom_bar(aes(y = (..count..)/sum(..count..))) + 
+  scale_y_continuous(labels=scales::percent) +
+  ylab("Prosent")+
+  xlab("Observasjon av rovdyr i kommunen")
+  scale_x_discrete(limits = c("Ja","Nei")) 
+
+
+# ArTilstede og innbyggertallgruppe 
+ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = ArtTilstede)) + 
+  geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(ArtTilstede)), stat="count") + 
+  scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
+  scale_x_discrete(limits = c("0-2499","2500-4900","5000-9999","10000-24999","25000-49999","50000-99999","100000+"))+ 
+  scale_fill_discrete(name = "ArtTilstede", labels = c("Ja", "Nei"))+#sjekk om det ble riktig
+  labs(y = "Prosent")+
+  theme( #ksempler på å "pynte" litt
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_blank()
+    ,legend.title = element_text(size=14, face="bold")
+    ,legend.text = element_text(size=14)
+    ,axis.title.x=element_text(size=14) #kan gjøre det samme for y også, samt for tallene på aksen
+  )+
+  theme(axis.line = element_line(color = 'black'))
+  
+  
+  
 #Eventuelt hvis du også vil se fordeling mtp feks kjønn med det samme
 ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = Kjønn)) + 
   geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(Kjønn)), stat="count") + 
   scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
-  scale_x_discrete(limits = c("-2499","2500-4900","5000-9999","10000-24999","25000-49999","50000-99999","10000+"))+ #10000+ mangler en null, og bør kanskje stå 1-2499 på første kattegori?
+  scale_x_discrete(limits = c("0-2499","2500-4900","5000-9999","10000-24999","25000-49999","50000-99999","100000+"))+ 
   scale_fill_discrete(name = "Kjønn", labels = c("Menn", "Kvinner"))+#sjekk om det ble riktig
   labs(y = "Prosent")+
   theme( #ksempler på å "pynte" litt
