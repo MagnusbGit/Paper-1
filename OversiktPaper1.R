@@ -115,36 +115,6 @@ ggplot(Arbeidsfil1, aes(Innbyggertallgruppe)) +
 str(Arbeidsfil1$ArtTilstede)
 table(Arbeidsfil1$ArtTilstede)
 
-# ArtTilstede
-names(Arbeidsfil1)
-str(Arbeidsfil1$ArtTilstede)
-ggplot(Arbeidsfil1, aes(ArtTilstede)) + 
-  geom_bar(aes(y = (..count..)/sum(..count..))) + 
-  scale_y_continuous(labels=scales::percent) +
-  ylab("Prosent")+
-  xlab("Observasjon av rovdyr i kommunen")
-  scale_x_discrete(limits = c("Ja","Nei")) 
-
-
-# ArTilstede og innbyggertallgruppe 
-ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = ArtTilstede)) + 
-  geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(ArtTilstede)), stat="count") + 
-  scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
-  scale_x_discrete(limits = c("0-2499","2500-4900","5000-9999","10000-24999","25000-49999","50000-99999","100000+"))+ 
-  scale_fill_discrete(name = "ArtTilstede", labels = c("Ja", "Nei"))+#sjekk om det ble riktig
-  labs(y = "Prosent")+
-  theme( #ksempler på å "pynte" litt
-    panel.background = element_blank()
-    ,panel.grid.major = element_blank()
-    ,panel.grid.minor = element_blank()
-    ,panel.border = element_blank()
-    ,legend.title = element_text(size=14, face="bold")
-    ,legend.text = element_text(size=14)
-    ,axis.title.x=element_text(size=14) #kan gjøre det samme for y også, samt for tallene på aksen
-  )+
-  theme(axis.line = element_line(color = 'black'))
-  
-  
   
 #Eventuelt hvis du også vil se fordeling mtp feks kjønn med det samme
 ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = Kjønn)) + 
@@ -196,13 +166,226 @@ ggplot(Arbeidsfil1, aes(factor(q8_3Inntekt))) +
   )+
   theme(axis.line = element_line(color = 'black'))
 
+# ArtTilstede
+names(Arbeidsfil1)
+str(Arbeidsfil1$ArtTilstede)
+ggplot(Arbeidsfil1, aes(ArtTilstede)) + 
+  geom_bar(aes(y = (..count..)/sum(..count..))) + 
+  scale_y_continuous(labels=scales::percent) +
+  ylab("Prosent")+
+  xlab("Observasjon av rovdyr i kommunen")
+scale_x_discrete(limits = c("Ja","Nei")) 
 
+
+# ArTilstede og innbyggertallgruppe 
+ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = ArtTilstede)) + 
+  geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(ArtTilstede)), stat="count") + 
+  scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
+  scale_x_discrete(limits = c("0-2499","2500-4900","5000-9999","10000-24999","25000-49999","50000-99999","100000+"))+ 
+  scale_fill_discrete(name = "ArtTilstede", labels = c("Ja", "Nei"))+#sjekk om det ble riktig
+  labs(y = "Prosent")+
+  theme( #ksempler på å "pynte" litt
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_blank()
+    ,legend.title = element_text(size=14, face="bold")
+    ,legend.text = element_text(size=14)
+    ,axis.title.x=element_text(size=14) #kan gjøre det samme for y også, samt for tallene på aksen
+  )+
+  theme(axis.line = element_line(color = 'black'))
 
 #str(Arbeidsfil1$q8_3Inntekt)
 #unique(Arbeidsfil1$q8_3Inntekt)
 #Arbeidsfil1$q8_3Inntekt <- factor(Arbeidsfil1$q8_3Inntekt, levels = c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","98","99"))
+str(Arbeidsfil1$q4_10)
+Arbeidsfil1$q4_3 <- as.ordered(Arbeidsfil1$q4_3)
+Arbeidsfil1$q4_10 <- as.ordered(Arbeidsfil1$q4_10)
 
 
+# 
+ggplot(Arbeidsfil1, aes(factor(q4_3))) + 
+  geom_bar(aes(y = (..count..)/sum(..count..))) + 
+  scale_y_continuous(labels=scales::percent) +
+  ylab("Prosent")+
+  theme( #ksempler på å "pynte" litt
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_rect(fill=NA,linetype = "dashed", colour = "black")
+    ,axis.title.y=element_text(size=14) #kan gjøre det samme for x også, samt for tallene på aksen
+  )+
+  theme(axis.line = element_line(color = 'black'))
+ggplot(Arbeidsfil1, aes(factor(q4_10))) + 
+  geom_bar(aes(y = (..count..)/sum(..count..))) + 
+  scale_y_continuous(labels=scales::percent) +
+  ylab("Prosent")+
+  theme( #ksempler på å "pynte" litt
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_rect(fill=NA,linetype = "dashed", colour = "black")
+    ,axis.title.y=element_text(size=14) #kan gjøre det samme for x også, samt for tallene på aksen
+  )+
+  theme(axis.line = element_line(color = 'black'))
+
+# få begge inn i samme plot
+library(reshape2)
+dat_l <- melt(dat, id.vars = c("Year", "Category"))
+p <- ggplot(data = dat_l, aes(x = Category, y = value, group = variable, fill = variable))
+p <- p + geom_bar(stat = "identity", width = 0.5, position = "dodge")
+p <- p + facet_grid(. ~ Year)
+p <- p + theme_bw()
+p <- p + theme(axis.text.x = element_text(angle = 90))
+p
+
+
+ggplot(Arbeidsfil1, aes(q4_10)) + 
+  geom_bar(aes(y = (..count..)/sum(..count..))) + 
+  scale_y_continuous(labels=scales::percent) +
+  ylab("Prosent")+
+  theme( #ksempler på å "pynte" litt
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_rect(fill=NA,linetype = "dashed", colour = "black")
+    ,axis.title.y=element_text(size=14) #kan gjøre det samme for x også, samt for tallene på aksen
+  )+
+  theme(axis.line = element_line(color = 'black'))
+
+
+ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = q4_10)) + 
+  geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(q4_10)), stat="count") + 
+  scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
+  scale_x_discrete(limits = c("0-2499","2500-4900","5000-9999","10000-24999","25000-49999","50000-99999","100000+"))+ 
+  scale_fill_discrete(name = "q4_10", labels = c("Fully disagree", "disagree","Neither nor","Agree","Fully agree"))+
+  labs(y = "Prosent")+
+  theme( #ksempler på å "pynte" litt
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_blank()
+    ,legend.title = element_text(size=14, face="bold")
+    ,legend.text = element_text(size=14)
+    ,axis.title.x=element_text(size=14) #kan gjøre det samme for y også, samt for tallene på aksen
+  )+
+  theme(axis.line = element_line(color = 'black'))
+
+ggplot(Arbeidsfil1, aes(Kjønn, group = q4_10)) + 
+  geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(q4_10)), stat="count") + 
+  scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
+  scale_x_discrete(limits = c("1","2"))+ 
+  scale_fill_discrete(name = "q4_10", labels = c("Fully disagree", "disagree","Neither nor","Agree","Fully agree"))+
+  labs(y = "Prosent")+
+  theme( #ksempler på å "pynte" litt
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_blank()
+    ,legend.title = element_text(size=14, face="bold")
+    ,legend.text = element_text(size=14)
+    ,axis.title.x=element_text(size=14) #kan gjøre det samme for y også, samt for tallene på aksen
+  )+
+  theme(axis.line = element_line(color = 'black'))
+
+ggplot(Arbeidsfil1, aes(ArtTilstede, group = q4_10)) + 
+  geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(q4_10)), stat="count") + 
+  scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
+  scale_x_discrete(limits = c("Ja","Nei"))+ 
+  scale_fill_discrete(name = "q4_10 Trust in carnivore research", labels = c("Fully disagree", "disagree","Neither nor","Agree","Fully agree"))+
+  labs(y = "Prosent")+
+  theme( #ksempler på å "pynte" litt
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_blank()
+    ,legend.title = element_text(size=14, face="bold")
+    ,legend.text = element_text(size=14)
+    ,axis.title.x=element_text(size=14) #kan gjøre det samme for y også, samt for tallene på aksen
+  )+
+  theme(axis.line = element_line(color = 'black'))
+
+
+ggplot(Arbeidsfil1, aes(ArtTilstede, group = q4_3)) + 
+  geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(q4_3)), stat="count") + 
+  scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
+  scale_x_discrete(limits = c("Ja","Nei"))+ 
+  scale_fill_discrete(name = "q4_3 Trust in research in general", labels = c("Fully disagree", "disagree","Neither nor","Agree","Fully agree"))+
+  labs(y = "Prosent")+
+  theme( #ksempler på å "pynte" litt
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_blank()
+    ,legend.title = element_text(size=14, face="bold")
+    ,legend.text = element_text(size=14)
+    ,axis.title.x=element_text(size=14) #kan gjøre det samme for y også, samt for tallene på aksen
+  )+
+  theme(axis.line = element_line(color = 'black'))
+
+
+ggplot(Arbeidsfil1, aes(ArtTilstede, group = q4_3)) + 
+  geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(q4_3)), stat="count") + 
+  scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
+  scale_x_discrete(limits = c("Ja","Nei"))+ 
+  scale_fill_discrete(name = "q4_3 Trust in research in general", labels = c("Fully disagree", "disagree","Neither nor","Agree","Fully agree"))+
+  labs(y = "Prosent")+
+  theme( #ksempler på å "pynte" litt
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_blank()
+    ,legend.title = element_text(size=14, face="bold")
+    ,legend.text = element_text(size=14)
+    ,axis.title.x=element_text(size=14) #kan gjøre det samme for y også, samt for tallene på aksen
+  )+
+  theme(axis.line = element_line(color = 'black'))
+
+
+# ArtTilstede og q4_3 og q4_10
+ggplot(Arbeidsfil1,aes(x = ArtTilstede,fill = factor(q4_3))) + 
+  geom_bar(position = "fill")
+ggplot(Arbeidsfil1,aes(x = ArtTilstede,fill = q4_10)) + 
+  geom_bar(position = "fill")
+
+# Ulv og q4_3 og q4_10
+ggplot(Arbeidsfil1,aes(x = ulv,fill = factor(q4_3))) + 
+  geom_bar(position = "fill")
+ggplot(Arbeidsfil1,aes(x = ulv,fill = factor(q4_10))) + 
+  geom_bar(position = "fill")
+
+# Ulv og q4_3 og q4_10
+ggplot(Arbeidsfil1,aes(x = RzoneTilstede,fill = factor(q4_3))) + 
+  geom_bar(position = "fill")
+ggplot(Arbeidsfil1,aes(x = RzoneTilstede,fill = factor(q4_10))) + 
+  geom_bar(position = "fill")
+
+# Opplevd skader q2_6.5
+Arbeidsfil1$q2_6.5 <- as.factor(Arbeidsfil1$q2_6.5)
+str(Arbeidsfil1$q2_6.5)
+ggplot(Arbeidsfil1,aes(x = q2_6.5,fill = factor(q4_3))) + 
+  geom_bar(position = "fill")
+ggplot(Arbeidsfil1,aes(x = q2_6.5,fill = factor(q4_10))) + 
+  geom_bar(position = "fill")
+ggplot(Arbeidsfil1, aes(q2_6.5, group = q4_10)) + 
+  geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(q4_10)), stat="count") + 
+  scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
+  scale_x_discrete(limits = c("0","1"))+ 
+  scale_fill_discrete(name = "q4_10 Trust in carnivore research", labels = c("Fully disagree", "disagree","Neither nor","Agree","Fully agree"))+
+  labs(y = "Prosent")+
+  theme( #ksempler på å "pynte" litt
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_blank()
+    ,legend.title = element_text(size=14, face="bold")
+    ,legend.text = element_text(size=14)
+    ,axis.title.x=element_text(size=14) #kan gjøre det samme for y også, samt for tallene på aksen
+  )+
+  theme(axis.line = element_line(color = 'black'))
+
+
+names(Arbeidsfil1)
 
 #positionsI <- c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","98","99")
 # Oversikt Aldersgrupe
