@@ -32,6 +32,8 @@ library(sqldf)
 library(RColorBrewer)
 library(ggthemes)
 library(stringr)
+library(wesanderson)
+
 
 
 # Load data
@@ -278,10 +280,10 @@ plot(PtestdataNEP_likert, ordered = FALSE, centered = FALSE, group.order = names
 
 # Plot q3_1 
 #Arbeidsfil1<-cbind(Arbeidsfil1,RovviltsituasjonN)
-mydata$q3_1a[mydata$q3_1b==4] <- NA
+mydata$q3_1a[mydata$q3_1a==4] <- NA
 mydata$q3_1b[mydata$q3_1b==4] <- NA
-mydata$q3_1c[mydata$q3_1b==4] <- NA
-mydata$q3_1d[mydata$q3_1b==4] <- NA
+mydata$q3_1c[mydata$q3_1c==4] <- NA
+mydata$q3_1d[mydata$q3_1d==4] <- NA
 is.na(mydata$q3_1a)
 ggplot(mydata,aes(x = RzoneTilstede,fill = factor(q3_1a))) + 
   geom_bar(position = "fill")
@@ -293,6 +295,7 @@ ggplot(mydata,aes(x = RzoneTilstede,fill = factor(q3_1d))) +
   geom_bar(position = "fill")
 ggplot(mydata,aes(x = RzoneTilstede,fill = factor(mydata$q3_1average))) + 
   geom_bar(position = "fill")
+
 
 table(mydata$RzoneTilstede)
 table(mydata$q3_1a)
@@ -445,6 +448,69 @@ ggplot(Arbeidsfil1, aes(q2_6.5, group = q4_10)) +
 
 # q3_1 Den generelle rovviltsituasjonen i Norge
 c("q3_1a","q3_1b", "q3_1c", "q3_1d") 
+
+#library(ggplot2)
+#library(RColorBrewer)
+##########
+
+# SPM: Den første er ok å se på, men jeg gjør ingen feil ved å gjøre dette? Ser jo at på den neste at antall respodenter er veldig forskjellig"  
+#install.packages("wesanderson")
+ggplot(Arbeidsfil1,aes(q2_6.5,fill = factor(q4_10))) +
+  geom_bar(position = "fill") + 
+  labs(y = "Proportion") +
+  labs(x = "Experienced damage to property") +
+  scale_fill_brewer(palette = "Paired", name="Trust in carnivore research", labels = c("Fully disagree", "Disagree","Neither nor","Agree","Fully agree"))+
+  theme( 
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_blank()
+    ,legend.title = element_text(size=14, face="bold")
+    ,legend.text = element_text(size=14)
+    ,axis.title.x=element_text(size=14) #kan gjøre det samme for y også, samt for tallene på aksen
+  )+
+  theme(axis.line = element_line(color = 'black'))
+  
+ggplot(Arbeidsfil1, aes(q2_6.5, group = q4_10)) + 
+    geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(q4_10)), stat="count") + 
+    scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
+    scale_x_discrete(limits = c("0","1"))+ 
+    scale_fill_discrete(name = "q4_10", labels = c("Fully disagree", "disagree","Neither nor","Agree","Fully agree"))+
+    labs(y = "Prosent")+
+    theme( #ksempler på å "pynte" litt
+      panel.background = element_blank()
+      ,panel.grid.major = element_blank()
+      ,panel.grid.minor = element_blank()
+      ,panel.border = element_blank()
+      ,legend.title = element_text(size=14, face="bold")
+      ,legend.text = element_text(size=14)
+      ,axis.title.x=element_text(size=14) #kan gjøre det samme for y også, samt for tallene på aksen
+    )+
+    theme(axis.line = element_line(color = 'black'))
+  
+  
+  
+  
+  
+  
+  
+############
+ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = Kjønn)) + 
+  geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(Kjønn)), stat="count") + 
+  scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
+  scale_x_discrete(limits = c("0-2499","2500-4900","5000-9999","10000-24999","25000-49999","50000-99999","100000+"))+ 
+  scale_fill_discrete(name = "Kjønn", labels = c("Menn", "Kvinner"))+#sjekk om det ble riktig
+  labs(y = "Prosent")+
+  theme( 
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_blank()
+    ,legend.title = element_text(size=14, face="bold")
+    ,legend.text = element_text(size=14)
+    ,axis.title.x=element_text(size=14) #kan gjøre det samme for y også, samt for tallene på aksen
+  )+
+  theme(axis.line = element_line(color = 'black'))
 
 
 names(Arbeidsfil1)
