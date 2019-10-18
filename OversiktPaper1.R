@@ -236,14 +236,12 @@ RovviltsituasjonN3<-RovviltsituasjonN2[,7]
 RovviltsituasjonN<- cbind(RovviltsituasjonN,RovviltsituasjonN3)
 RovviltsituasjonN2<-RovviltsituasjonN[,6:7]
 head(RovviltsituasjonN2)
-mydata<-cbind(mydata,RovviltsituasjonN2)
 table(mydata$q3_1average)
 
 # include NEP and q3_1 averages and medians into mydata
 mydata<-cbind(mydata,NEP2)
 mydata<-cbind(mydata,RovviltsituasjonN2)
-
-# make table of NEP - FUNKER IKKE. FIks 
+# make table of NEP
 tab_q3_1 <- mydata %>%
   group_by(q3_1average) %>%
   summarize(Freq = n()) %>%
@@ -256,6 +254,7 @@ ggplot(mydata, aes(mydata$q3_1average)) +
   ylab("Prosent")+
   scale_x_discrete(limits = c("1","2","3","4","5")) 
 
+# FUNGERE IKKE - FIKS. 
 PtestdataNEP <- NEP[,c("q6_1","q6_2","q6_3","q6_4","q6_5","q6_6","q6_7","median")]
 PtestdataNEP [1:8] <- lapply(PtestdataNEP [1:8], factor, levels = 1:5)
 PtestdataNEP_likert<-likert(PtestdataNEP [1:8])
