@@ -7,15 +7,12 @@ library(grid)
 library(nnet)
 library(coin)
 library(boot)
-#library(simpleboot) # NO
 library(knitr)
 library(ggplot2)
 library(dplyr)
 library(AICcmodavg)
-#library(polycor) #NO
 library(likert)
 library(MASS)
-#library(ordinal) # NO
 library(likert)
 library(simpleboot)
 library(Hmisc)
@@ -33,8 +30,6 @@ library(RColorBrewer)
 library(ggthemes)
 library(stringr)
 library(wesanderson)
-
-
 
 # Load data
 setwd("C:/Users/magnusb/Filr/My Files/Oppgave/Data spørreundersøkelse/RETTredigert/Arbeidsfil Paper 1")
@@ -86,7 +81,6 @@ ggplot(Arbeidsfil1, aes(q8_2Arbeid)) +
 
 
 # Oversikt kj?nn
-names(Arbeidsfil1)
 tab_Kjønn <- Arbeidsfil1 %>%
   group_by(Kjønn) %>%
   summarize(Freq = n()) %>%
@@ -100,7 +94,6 @@ ggplot(Arbeidsfil1, aes(Kjønn)) +
   scale_x_discrete(limits = c("1","2")) 
 
 # Oversikt L?nn
-#Arbeidsfil1$q8_3Inntekt <- factor(Arbeidsfil1$q8_3Inntekt, levels = c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","98","99"))
 tab_q8_3Inntekt <- Arbeidsfil1 %>%
   group_by(q8_3Inntekt) %>%
   summarize(Freq = n()) %>%
@@ -114,7 +107,7 @@ ggplot(data = tab_q8_3Inntekt, mapping = aes(x = tab_q8_3Inntekt$q8_3Inntekt, y 
   coord_flip() + 
   scale_x_discrete(limits = c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","98","99")) # Labels layer omitted
 
-#Samme for lønnstrinn
+#Oversikt lønnstrinn ift innbyggergruppe - OBS IKKE IFORMATIV. DROPP 
 ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = q8_3Inntekt)) + 
   geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(q8_3Inntekt)), stat="count") + 
   scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
@@ -132,7 +125,7 @@ ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = q8_3Inntekt)) +
   )+
   theme(axis.line = element_line(color = 'black'))
 
-#eller forenklet
+# Oversikt lønnstrinn 
 ggplot(Arbeidsfil1, aes(factor(q8_3Inntekt))) + 
   geom_bar(aes(y = (..count..)/sum(..count..))) + 
   scale_y_continuous(labels=scales::percent) +
@@ -171,13 +164,6 @@ ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = ArtTilstede)) +
     ,axis.title.x=element_text(size=14) #kan gjøre det samme for y også, samt for tallene på aksen
   )+
   theme(axis.line = element_line(color = 'black'))
-
-#str(Arbeidsfil1$q8_3Inntekt)
-#unique(Arbeidsfil1$q8_3Inntekt)
-#Arbeidsfil1$q8_3Inntekt <- factor(Arbeidsfil1$q8_3Inntekt, levels = c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","98","99"))
-str(Arbeidsfil1$q4_10)
-Arbeidsfil1$q4_3 <- as.ordered(Arbeidsfil1$q4_3)
-Arbeidsfil1$q4_10 <- as.ordered(Arbeidsfil1$q4_10)
 
 
 # 
@@ -257,7 +243,7 @@ table(mydata$q3_1average)
 mydata<-cbind(mydata,NEP2)
 mydata<-cbind(mydata,RovviltsituasjonN2)
 
-# make table of NEP
+# make table of NEP - FUNKER IKKE. FIks 
 tab_q3_1 <- mydata %>%
   group_by(q3_1average) %>%
   summarize(Freq = n()) %>%
@@ -867,3 +853,6 @@ ci <- confint(m)
 exp(coef(m))
 exp(cbind(OR = coef(m), ci))
 vif(m)
+
+
+#
