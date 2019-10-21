@@ -152,8 +152,9 @@ ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = ArtTilstede)) +
   geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(ArtTilstede)), stat="count") + 
   scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
   scale_x_discrete(limits = c("0-2499","2500-4900","5000-9999","10000-24999","25000-49999","50000-99999","100000+"))+ 
-  scale_fill_discrete(name = "ArtTilstede", labels = c("Ja", "Nei"))+#sjekk om det ble riktig
-  labs(y = "Prosent")+
+  scale_fill_discrete(name = "Carnivore present", labels = c("Yes", "No"))+#sjekk om det ble riktig
+  labs(y = "Percentage")+
+  labs(x = "Population")+
   theme( #ksempler på å "pynte" litt
     panel.background = element_blank()
     ,panel.grid.major = element_blank()
@@ -165,32 +166,36 @@ ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = ArtTilstede)) +
   )+
   theme(axis.line = element_line(color = 'black'))
 
-
 # 
 ggplot(Arbeidsfil1, aes(factor(q4_3))) + 
   geom_bar(aes(y = (..count..)/sum(..count..))) + 
   scale_y_continuous(labels=scales::percent) +
-  ylab("Prosent")+
-  theme( #ksempler på å "pynte" litt
+  labs(y = "Percentage")+
+  labs(x = "Trust in science in general")+
+  theme( 
     panel.background = element_blank()
     ,panel.grid.major = element_blank()
     ,panel.grid.minor = element_blank()
     ,panel.border = element_rect(fill=NA,linetype = "dashed", colour = "black")
     ,axis.title.y=element_text(size=14) #kan gjøre det samme for x også, samt for tallene på aksen
+    ,axis.title.x=element_text(size=14) #kan gjøre det samme for x også, samt for tallene på aksen
   )+
   theme(axis.line = element_line(color = 'black'))
 ggplot(Arbeidsfil1, aes(factor(q4_10))) + 
   geom_bar(aes(y = (..count..)/sum(..count..))) + 
   scale_y_continuous(labels=scales::percent) +
   ylab("Prosent")+
-  theme( #ksempler på å "pynte" litt
+  labs(x = "Trust in carnivore research")+
+  theme( 
     panel.background = element_blank()
     ,panel.grid.major = element_blank()
     ,panel.grid.minor = element_blank()
     ,panel.border = element_rect(fill=NA,linetype = "dashed", colour = "black")
     ,axis.title.y=element_text(size=14) #kan gjøre det samme for x også, samt for tallene på aksen
+    ,axis.title.x=element_text(size=14) #kan gjøre det samme for x også, samt for tallene på aksen
   )+
   theme(axis.line = element_line(color = 'black'))
+
 
 # SPØRSMÅL:  er det mulig å få q4_3 og q4_10 inn i samme plot men som viser forskjellen for de i og utenfor rovdyrområde for Helt uenig, uenig osv (dvs. 1-5) (altså de to ggplottene over i samme plot)? 
 # ... eller blir det ikke like beskrivende som jeg tror uansett. 
@@ -219,12 +224,9 @@ NEP4<-NEP2[,10]
 NEP<- cbind(NEP,NEP4)
 names(NEP)[names(NEP) == "average"] <- "q6_average"
 names(NEP)[names(NEP) == "median"] <- "q6_median"
-head(NEP2)
 NEP2<- NEP[,9:10]
-
-
+head(NEP)
 # calculating q3_1 average
-names(mydata)
 RovviltsituasjonN<-mydata[,c("RESPID",c("q3_1a","q3_1b", "q3_1c", "q3_1d") )]
 head(RovviltsituasjonN)
 # make average and median
@@ -235,8 +237,7 @@ RovviltsituasjonN2<-RovviltsituasjonN %>%
 RovviltsituasjonN3<-RovviltsituasjonN2[,7]
 RovviltsituasjonN<- cbind(RovviltsituasjonN,RovviltsituasjonN3)
 RovviltsituasjonN2<-RovviltsituasjonN[,6:7]
-head(RovviltsituasjonN2)
-table(mydata$q3_1average)
+head(RovviltsituasjonN)
 
 # include NEP and q3_1 averages and medians into mydata
 mydata<-cbind(mydata,NEP2)
