@@ -243,7 +243,7 @@ head(RovviltsituasjonN)
 mydata<-cbind(mydata,NEP2)
 mydata<-cbind(mydata,RovviltsituasjonN2)
 # make table of NEP
-tab_q3_1 <- mydata %>%
+tab_q3_1avg <- mydata %>%
   group_by(q3_1average) %>%
   summarize(Freq = n()) %>%
   mutate(Prop = Freq/sum(Freq)) %>%
@@ -254,6 +254,52 @@ ggplot(mydata, aes(mydata$q3_1average)) +
   scale_y_continuous(labels=scales::percent) +
   ylab("Prosent")+
   scale_x_discrete(limits = c("1","2","3","4","5")) 
+ggplot(mydata, aes(mydata$q3_1b)) + 
+  geom_bar(aes(y = (..count..)/sum(..count..))) + 
+  scale_y_continuous(labels=scales::percent) +
+  ylab("Prosent")+
+  scale_x_discrete(limits = c("1","2","3","4","5")) 
+head(mydata)
+
+ggplot(mydata, aes(mydata$q3_1average)) + 
+  geom_bar(aes(y = (..count..)/sum(..count..))) + 
+  scale_y_continuous(labels=scales::percent) +
+  ylab("Prosent")+
+  scale_x_discrete(limits = c("1","2","3","4","5")) 
+
+
+ggplot(mydata, aes(mydata$q3_1b)) + 
+  geom_bar(aes(y = (..count..)/sum(..count..))) + 
+  scale_y_continuous(labels=scales::percent) +
+  ylab("Prosent")+
+  scale_x_discrete(limits = c("1","2","3","4","5"))+
+  facet_wrap(~Kjønn) 
+
+# Kjønn ~ Trust in carnivore research (q4_10)
+ggplot(mydata, aes(mydata$q4_10)) + 
+  geom_bar(aes(y = (..count..)/sum(..count..))) + 
+  scale_y_continuous(labels=scales::percent) +
+  ylab("Prosent")+
+  scale_x_discrete(limits = c("1","2","3","4","5"))+
+  facet_wrap(~Kjønn) 
+
+# Hva synes du om mengde ulv (q3_1b) ~ Trust in carnivore research (q4_10)
+ggplot(mydata, aes(mydata$q4_10)) + 
+  geom_bar(aes(y = (..count..)/sum(..count..))) + 
+  scale_y_continuous(labels=scales::percent) +
+  ylab("Prosent")+
+  scale_x_discrete(limits = c("1","2","3","4","5"))+
+  facet_wrap(~mydata$q3_1b) 
+
+
+
+### 
+ggplot(mydata, aes(value)) +
+  geom_histogram(binwidth=1) +
+  facet_wrap(~variable, ncol=1) +
+  xlab("Likert Scale Value") +
+  theme_bw()
+
 
 # FUNGERE IKKE - FIKS. 
 PtestdataNEP <- NEP[,c("q6_1","q6_2","q6_3","q6_4","q6_5","q6_6","q6_7","median")]
@@ -551,13 +597,27 @@ PtestdataGenerelt <- Arbeidsfil1[,c("q4_1","q4_2","q4_3")]
 
 PtestdataGenerelt<- PtestdataGenerelt %>% 
   rename(
-    Forskning_er_viktig = q4_1,
-    Troen_pa_forskning = q4_2,
-    Tillit_til_forkning.generelt = q4_3,
+    Science_is_important = q4_1,
+    Important_that_people_trust_science = q4_2,
+    Trust_in_general_science = q4_3,
   )
 PtestdataGenerelt[1:3] <- lapply(PtestdataGenerelt[1:3], factor, levels = 1:5)
 PtestdataGenerelt_likert<-likert(PtestdataGenerelt[1:3])
 plot(PtestdataGenerelt_likert, ordered = FALSE, centered = FALSE, group.order = names(PtestdataGenerelt[1:3]))
+plot(PtestdataGenerelt_likert, ordered = FALSE, centered = TRUE, group.order = names(PtestdataGenerelt[1:3]))
+
+# Forskning generelt and sex 
+PtestdataGenerelt <- Arbeidsfil1[,c("Kjønn","q4_1","q4_2","q4_3")]
+PtestdataGenerelt<- PtestdataGenerelt %>% 
+  rename(Science_is_important = q4_1,
+    Important_that_people_trust_science = q4_2,
+    Trust_in_general_science = q4_3,)
+PtestdataGenerelt[2:4] <- lapply(PtestdataGenerelt[2:4], factor, levels = 1:5)
+both_PtestdataGenerelt_likert = likert(PtestdataGenerelt[,c(2:4),drop=FALSE], grouping = PtestdataGenerelt$Kjønn)
+plot(both_PtestdataGenerelt_likert, include.histogram = FALSE)
+plot(both_PtestdataGenerelt_likert, type ="density")
+
+
 
 
 #spesifikk forskning
@@ -589,6 +649,38 @@ PtestdataGenRov<- PtestdataGenRov %>%
 PtestdataGenRov[1:7] <- lapply(PtestdataGenRov[1:7], factor, levels = 1:5)
 PtestdataGenRov_likert<-likert(PtestdataGenRov[1:7])
 plot(PtestdataGenRov_likert, ordered = FALSE, centered = FALSE, group.order = names(PtestdataGenRov[1:7]))
+
+plot(both_PtestdataGenerelt_likert, include.histogram = FALSE)
+
+# Forskning generelt and sex 
+names(Arbeidsfil1)
+PtestdataGenRov <- Arbeidsfil1[,c("q4_3","q4_6","q4_7","q4_10","q4_8","q4_9","q4_11","Kjønn","RzoneTilstede","ArtTilstede" )]
+PtestdataGenRov<- PtestdataGenRov %>% 
+  rename(Tillit_til_forskning_generelt = q4_3,
+    Gen.forsk_hoy_ekspertise = q4_6,
+    Gen.forsk_hoy_troverdighet = q4_7,
+    Rov.forsk_hoy_ekspertise = q4_8,
+    Rov.forsk_hoy_troverdighet = q4_9,
+    Tillit_til_rovviltforskning = q4_10,
+    Tillit_til_rovviltforskning_som_gen.forsk = q4_11,)
+PtestdataGenRov[1:7] <- lapply(PtestdataGenRov[1:7], factor, levels = 1:5)
+PtestdataGenRov_likert<-likert(PtestdataGenRov[1:7])
+plot(PtestdataGenRov_likert, ordered = FALSE, centered = FALSE, group.order = names(PtestdataGenRov[1:7]))
+
+both_PtestdataGenRov_likert_sex = likert(PtestdataGenRov[,c(1:7),drop=FALSE], grouping = PtestdataGenRov$Kjønn)
+plot(both_PtestdataGenRov_likert_sex, include.histogram = FALSE)
+plot(both_PtestdataGenRov_likert_sex, type ="density")
+
+# Forskning carnivore and zone tilstede
+both_PtestdataGenRov_likert_RZT = likert(PtestdataGenRov[,c(1:7),drop=FALSE], grouping = PtestdataGenRov$RzoneTilstede)
+plot(both_PtestdataGenRov_likert_RZT, include.histogram = FALSE)
+plot(both_PtestdataGenRov_likert_RZT, type ="density")
+
+# Forskning carnivore and Rovvilttilstede
+both_PtestdataGenRov_likert_RT = likert(PtestdataGenRov[,c(1:7),drop=FALSE], grouping = PtestdataGenRov$ArtTilstede)
+plot(both_PtestdataGenRov_likert_RT, include.histogram = FALSE)
+plot(both_PtestdataGenRov_likert_RT, type ="density")
+
 
 
 ## Example of type of plotting
