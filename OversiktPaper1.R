@@ -43,9 +43,7 @@ Arbeidsfil1$Innbyggertallgruppe[Arbeidsfil1$Innbyggertallgruppe == "-2499"] <- "
 Arbeidsfil1$Innbyggertallgruppe <- factor(Arbeidsfil1$Innbyggertallgruppe,levels=c("0-2499", "2500-4900","10000-24999", "25000-49999", "5000-9999", "50000-99999", "100000+"))
 
 
-######                                    ######
-# OVersikt over demografi og økonomi #
-######                                    ######
+###### O: demografi og økonomi ######
 detach(package:Hmisc)
 # Oversikt innbyggertallgruppe
 ggplot(Arbeidsfil1, aes(Innbyggertallgruppe)) + 
@@ -139,6 +137,8 @@ ggplot(Arbeidsfil1, aes(factor(q8_3Inntekt))) +
   )+
   theme(axis.line = element_line(color = 'black'))
 
+#### O Arttilstede, rovviltsone, ####
+
 # ArtTilstede
 ggplot(Arbeidsfil1, aes(ArtTilstede)) + 
   geom_bar(aes(y = (..count..)/sum(..count..))) + 
@@ -166,7 +166,10 @@ ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = ArtTilstede)) +
   )+
   theme(axis.line = element_line(color = 'black'))
 
-# 
+
+
+
+#### O: Trust ####   
 ggplot(Arbeidsfil1, aes(factor(q4_3))) + 
   geom_bar(aes(y = (..count..)/sum(..count..))) + 
   scale_y_continuous(labels=scales::percent) +
@@ -200,8 +203,8 @@ ggplot(Arbeidsfil1, aes(factor(q4_10))) +
 # SPØRSMÅL:  er det mulig å få q4_3 og q4_10 inn i samme plot men som viser forskjellen for de i og utenfor rovdyrområde for Helt uenig, uenig osv (dvs. 1-5) (altså de to ggplottene over i samme plot)? 
 # ... eller blir det ikke like beskrivende som jeg tror uansett. 
 
-
-# NEP - reverse values and calculate mean. Median to? 
+####  NEP and q3_1 calc #### 
+#  NEP - reverse values and calculate mean. Median to? 
 mydata <- read.csv(file="DatasetSpørreundersøkelseOkt2019.csv",header=T,sep=";")
 NEP<-mydata[,c("RESPID","q6_1","q6_2","q6_3","q6_4","q6_5","q6_6","q6_7")]
 NEP2<-NEP[2:8]
@@ -242,6 +245,8 @@ head(RovviltsituasjonN)
 # include NEP and q3_1 averages and medians into mydata
 mydata<-cbind(mydata,NEP2)
 mydata<-cbind(mydata,RovviltsituasjonN2)
+
+#### NEP and q3_1 #### 
 # make table of NEP
 tab_q3_1avg <- mydata %>%
   group_by(q3_1average) %>%
@@ -293,14 +298,6 @@ ggplot(mydata, aes(mydata$q4_10)) +
 
 
 
-### 
-ggplot(mydata, aes(value)) +
-  geom_histogram(binwidth=1) +
-  facet_wrap(~variable, ncol=1) +
-  xlab("Likert Scale Value") +
-  theme_bw()
-
-
 # FUNGERE IKKE - FIKS. 
 PtestdataNEP <- NEP[,c("q6_1","q6_2","q6_3","q6_4","q6_5","q6_6","q6_7","median")]
 PtestdataNEP [1:8] <- lapply(PtestdataNEP [1:8], factor, levels = 1:5)
@@ -309,7 +306,7 @@ plot(PtestdataNEP_likert, ordered = FALSE, centered = FALSE, group.order = names
 
 # q3_1 Generelle rovviltsituasjonen i Norge
 
-
+#### Holdninger - hva har effekt? #### 
 # Plot q3_1 
 #Arbeidsfil1<-cbind(Arbeidsfil1,RovviltsituasjonN)
 mydata$q3_1a[mydata$q3_1a==4] <- NA
@@ -333,6 +330,8 @@ table(mydata$RzoneTilstede)
 table(mydata$q3_1a)
 str(mydata$q3_1a)
 str(mydata$q4_10)
+
+#### Tillit - Hva har effekt? ####  
 # tillit til rovviltforskning (q4_10) relatert til hva man synes om rovviltsituasjonen i Norge (q3_1)
 ggplot(Arbeidsfil1,aes(x = factor(q3_1a),fill = factor(q4_10))) + 
   geom_bar(position = "fill")
@@ -341,13 +340,6 @@ ggplot(Arbeidsfil1,aes(x = factor(q3_1a),fill = factor(q4_3))) +
   geom_bar(position = "fill")
 
 
-#### Bruke anna type plot: 
-
-
-
-
-
-#### --------------------------------------
 
 ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = q4_10)) + 
   geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(q4_10)), stat="count") + 
@@ -481,10 +473,6 @@ ggplot(Arbeidsfil1, aes(q2_6.5, group = q4_10)) +
 # q3_1 Den generelle rovviltsituasjonen i Norge
 c("q3_1a","q3_1b", "q3_1c", "q3_1d") 
 
-#library(ggplot2)
-#library(RColorBrewer)
-##########
-
 # SPM: Den første er ok å se på, men jeg gjør ingen feil ved å gjøre dette? Ser jo at på den neste at antall respodenter er veldig forskjellig"  
 #install.packages("wesanderson")
 ggplot(Arbeidsfil1,aes(q2_6.5,fill = factor(q4_10))) +
@@ -521,31 +509,8 @@ ggplot(Arbeidsfil1, aes(q2_6.5, group = q4_10)) +
     theme(axis.line = element_line(color = 'black'))
   
   
-  
-  
-  
-  
-  
-############
-ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = Kjønn)) + 
-  geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(Kjønn)), stat="count") + 
-  scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
-  scale_x_discrete(limits = c("0-2499","2500-4900","5000-9999","10000-24999","25000-49999","50000-99999","100000+"))+ 
-  scale_fill_discrete(name = "Kjønn", labels = c("Menn", "Kvinner"))+#sjekk om det ble riktig
-  labs(y = "Prosent")+
-  theme( 
-    panel.background = element_blank()
-    ,panel.grid.major = element_blank()
-    ,panel.grid.minor = element_blank()
-    ,panel.border = element_blank()
-    ,legend.title = element_text(size=14, face="bold")
-    ,legend.text = element_text(size=14)
-    ,axis.title.x=element_text(size=14) #kan gjøre det samme for y også, samt for tallene på aksen
-  )+
-  theme(axis.line = element_line(color = 'black'))
 
 
-names(Arbeidsfil1)
 
 #positionsI <- c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","98","99")
 # Oversikt Aldersgrupe
@@ -565,20 +530,8 @@ names(Arbeidsfil1)
 #  scale_x_discrete(limits = positions) # Labels layer omitted
 
 
-##### 
-# Oversikt over svar 
-#####
+#### O: svar ####
 
-
-# boxplot - Tillit sp?rsm?l q4_1, q4_4, q4_5 og q4_10 - ikke veldig informativ - forslag til endring? bare droppe boxplot kanskje. 
-b_q4_1 <- Arbeidsfil1$q4_1
-b_q4_4 <- Arbeidsfil1$q4_4
-b_q4_5 <- Arbeidsfil1$q4_5
-b_q4_10 <- Arbeidsfil1$q4_10
-boxplot(b_q4_1,b_q4_4,b_q4_5,b_q4_10,
-main="Tillit sp?rsm?l q4_1, q4_4, q4_5 og q4_10",
-at = c(1,2,3,4), names = c("Generell","Medisin","Klima","Rovvilt"),las = 1,
-col = c("grey"), horizontal = T,notch = TRUE)
 
 # Make centered likert charts
 Ptestdata<- Arbeidsfil1[,c("q4_1","q4_2","q4_3","q4_6","q4_7")]
@@ -589,8 +542,6 @@ Ptestdata_likert<-likert(Ptestdata[1:5])
 plot(Ptestdata_likert, ordered = FALSE, group.order = names(Ptestdata[1:5]))
 plot(Ptestdata_likert, ordered = FALSE, centered = FALSE, group.order = names(Ptestdata[1:5]))
 plot(Ptestdata_likert, type = "heat",group.order = names(Ptestdata[1:5]))
-
-
 
 #Forskning generelt
 PtestdataGenerelt <- Arbeidsfil1[,c("q4_1","q4_2","q4_3")]
@@ -683,7 +634,7 @@ plot(both_PtestdataGenRov_likert_RT, type ="density")
 
 
 
-## Example of type of plotting
+#### Example of type of plotting ####
 # plot with grouping
 # Create likert object with groupings included
 Ptestdata2 <- Arbeidsfil1[,c("Innbyggertallgruppe","q4_1","q4_2","q4_3","q4_6","q4_7")]
@@ -717,15 +668,11 @@ plot(both_PtestdataKjønn_likert, include.histogram = TRUE) # SPM: hvordan endre
 # Related to number of carnivore species zones
 #PtestdataSex <- Arbeidsfil1[,c("Sex","q4_1","q4_2","q4_3","q4_4","q4_5","q4_6","q4_7","q4_8","q4_9","q4_10","q4_11")]
 PtestdataRdyr <- Arbeidsfil1[,c("AntallRartZone","q4_3","q4_4","q4_5","q4_10","q4_11")]
-ggplot(PtestdataRdyr, aes())
-str(PtestdataRdyr)
 PtestdataRdyr[2:6] <- lapply(PtestdataRdyr[2:6], factor, levels = 1:5)
 PtestdataRdyr$AntallRartZone<-factor(PtestdataRdyr$AntallRartZone, levels=c("0","1","2","3","4"))
 str(PtestdataRdyr$AntallRartZone)
 both_PtestdataRdyr_likert = likert(PtestdataRdyr[, c(2:6), drop = FALSE], grouping = PtestdataRdyr$AntallRartZone)
 plot(both_PtestdataRdyr_likert, include.histogram = TRUE)
-
-
 
 agg_table <- sqldf::sqldf("select question, category, SUM(responses) as total from survey group by question, category")
 summarized_table <- agg_table %>%
@@ -901,11 +848,20 @@ XTIGq4_1prop
 barplot(XTIGq4_10prop, beside=TRUE,
         legend=TRUE, ylim=c(0, 0.4),xlab="Likert score", ylab="Frequency", args.legend = list(x="topleft"))
 
+#### EKSTRA - plotting #### 
+# boxplot - Tillit sp?rsm?l q4_1, q4_4, q4_5 og q4_10 - ikke veldig informativ - forslag til endring? bare droppe boxplot kanskje. 
+b_q4_1 <- Arbeidsfil1$q4_1
+b_q4_4 <- Arbeidsfil1$q4_4
+b_q4_5 <- Arbeidsfil1$q4_5
+b_q4_10 <- Arbeidsfil1$q4_10
+boxplot(b_q4_1,b_q4_4,b_q4_5,b_q4_10,
+        main="Tillit sp?rsm?l q4_1, q4_4, q4_5 og q4_10",
+        at = c(1,2,3,4), names = c("Generell","Medisin","Klima","Rovvilt"),las = 1,
+        col = c("grey"), horizontal = T,notch = TRUE)
 
 
 
-
-#### Let us test some stuff
+#### EKSTRA - testing ####
 library(Hmisc)
 # Examine data
 head(Arbeidsfil1)
@@ -947,4 +903,4 @@ exp(cbind(OR = coef(m), ci))
 vif(m)
 
 
-#
+
