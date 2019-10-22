@@ -478,15 +478,23 @@ c("q3_1a","q3_1b", "q3_1c", "q3_1d")
 #install.packages("wesanderson")
 
 ### Experienced damage ~ Trust carnivore research (proportion)
-ggplot(Arbeidsfil1,aes(q2_6.5,fill = factor(q4_10))) +
+mydata$q2_6.5[mydata$q2_6.5==0] <- "Damage"
+mydata$q2_6.5[mydata$q2_6.5==1] <- "Not damage"
+
+
+range(mydata$q2_6.5)
+
+ggplot(mydata,aes(factor(q2_6.5),fill = factor(q4_10))) +
   geom_bar(position = "fill") + 
   labs(y = "Proportion") +
-  labs(x = "No experienced damage to any property") +
+  labs(x = "Experienced damage to property") +
   scale_fill_manual(values = c("red2","lightcoral","gray77","dodgerblue1","blue1"), name="Trust in carnivore research", labels = c("Fully disagree", "Disagree","Neither nor","Agree","Fully agree"))+
   theme( 
     panel.background = element_blank(),panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.border = element_blank()
     ,legend.title = element_text(size=14, face="bold") ,legend.text = element_text(size=14) ,axis.title.x=element_text(size=14) ,axis.title.y=element_text(size=14)
     )+ theme(axis.line = element_line(color = 'black'))
+mydata$q2_6.5[mydata$q2_6.5=="Damage"] <- 0 
+mydata$q2_6.5[mydata$q2_6.5== "Not damage"] <- 1
 ### Experienced damage ~ Trust carnivore research (percentage)
 ggplot(Arbeidsfil1, aes(q2_6.5, group = q4_10)) + 
   geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(q4_10)), stat="count") + 
@@ -610,6 +618,9 @@ plot(PtestdataGenRov_likert, ordered = FALSE, centered = TRUE, group.order = nam
 
 # Forskning generelt and sex 
 names(Arbeidsfil1)
+install.packages("mudata")
+library(mudata)
+names(PtestdataGenRov)
 PtestdataGenRov <- Arbeidsfil1[,c("q4_3","q4_6","q4_7","q4_10","q4_8","q4_9","q4_11","Kjønn","RzoneTilstede","ArtTilstede","CatAlder" )]
 PtestdataGenRov<- PtestdataGenRov %>% 
   rename(Trust_gen.research_generelt = q4_3,
@@ -619,7 +630,13 @@ PtestdataGenRov<- PtestdataGenRov %>%
     Carn.res_high_credibility = q4_9,
     Carn.res_trust = q4_10,
     Carn.res_trust_as_Gen.res_trust = q4_11,)
+head(PtestdataGenRov)
+#PtestdataGenRov$Kjønn <- c("1", "2")
+PtestdataGenRov$Kjønn[PtestdataGenRov$Kjønn==1] <- "Male"
+PtestdataGenRov$Kjønn[PtestdataGenRov$Kjønn==2] <- "Female"
+
 PtestdataGenRov[1:7] <- lapply(PtestdataGenRov[1:7], factor, levels = 1:5)
+PtestdataGenRov[1:7] <- lapply(PtestdataGenRov[1:7], factor)
 PtestdataGenRov_likert<-likert(PtestdataGenRov[1:7])
 plot(PtestdataGenRov_likert, ordered = FALSE, centered = TRUE, group.order = names(PtestdataGenRov[1:7]))
 PtestdataGenRov_likert<-likert(PtestdataGenRov[1,4])
