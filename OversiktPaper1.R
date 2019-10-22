@@ -234,6 +234,7 @@ PtestdataNEP_likert<-likert(PtestdataNEP [1:8])
 plot(PtestdataNEP_likert, ordered = FALSE, centered = FALSE, group.order = names(PtestdataNEP [1:8]))
 
 # NEP median
+
 ggplot(mydata,aes(q6_median,fill = factor(q4_10))) +
   geom_bar(position = "fill") + 
   labs(y = "Proportion") +
@@ -307,14 +308,23 @@ ggplot(mydata,aes(x = RzoneTilstede,fill = factor(mydata$q3_1average))) +
 
 #### Tillit - Hva har effekt? ####  
 # tillit til rovviltforskning (q4_10) relatert til hva man synes om rovviltsituasjonen i Norge (q3_1)
-ggplot(Arbeidsfil1,aes(x = factor(q3_1a),fill = factor(q4_10))) + 
-  geom_bar(position = "fill"+
-  labs(y="Proportion") +
-  labs(x= )         )
+#ggplot(Arbeidsfil1,aes(x = factor(q3_1a),fill = factor(q4_10))) + 
+#  geom_bar(position = "fill"+
+#  labs(y="Proportion") +
+#  labs(x= )         )
 
 # tillit til forskning generelt (q4_3) relatert til hva man synes om rovviltsituasjonen i Norge (q3_1)
 ggplot(Arbeidsfil1,aes(x = factor(q3_1b),fill = factor(q4_3))) + 
   geom_bar(position = "fill")
+
+#mydata$q3_1b<-factor(mydata$q3_1b)
+#mydata$q3_1b<-mydata$q3_1b %>% 
+#  rename(
+#    Too_few = 1,
+#    Good = 2,
+#   Too_many =3,
+#    Do_not_know = <NA>
+#  )
 
 ggplot(mydata,aes(factor(q3_1b),fill = factor(q4_10))) +
   geom_bar(position = "fill") + 
