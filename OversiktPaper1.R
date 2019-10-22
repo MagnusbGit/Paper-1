@@ -41,16 +41,18 @@ Arbeidsfil1$Innbyggertallgruppe <- as.character(Arbeidsfil1$Innbyggertallgruppe)
 Arbeidsfil1$Innbyggertallgruppe[Arbeidsfil1$Innbyggertallgruppe == "10000+"] <- "100000+"
 Arbeidsfil1$Innbyggertallgruppe[Arbeidsfil1$Innbyggertallgruppe == "-2499"] <- "0-2499"
 Arbeidsfil1$Innbyggertallgruppe <- factor(Arbeidsfil1$Innbyggertallgruppe,levels=c("0-2499", "2500-4900","10000-24999", "25000-49999", "5000-9999", "50000-99999", "100000+"))
-
+# Lag aldersgruppe-variabel 
+CatAlder <- cut(Arbeidsfil1$Alder, breaks = c(0,30,45,66,100), labels = c("<30","31-45","46-66",">67"))
+Arbeidsfil1 <- cbind(Arbeidsfil1,CatAlder)
 
 ###### O: demografi og økonomi ######
 detach(package:Hmisc)
 # Oversikt innbyggertallgruppe
-ggplot(Arbeidsfil1, aes(Innbyggertallgruppe)) + 
-  geom_bar(aes(y = (..count..)/sum(..count..))) + 
-  scale_y_continuous(labels=scales::percent) +
-  ylab("Prosent")+
-  scale_x_discrete(limits = c("0-2499","2500-4900","5000-9999","10000-24999","25000-49999","50000-99999","100000+")) 
+#ggplot(Arbeidsfil1, aes(Innbyggertallgruppe)) + 
+#  geom_bar(aes(y = (..count..)/sum(..count..))) + 
+#  scale_y_continuous(labels=scales::percent) +
+#  ylab("Prosent")+
+# scale_x_discrete(limits = c("0-2499","2500-4900","5000-9999","10000-24999","25000-49999","50000-99999","100000+")) 
 
 # Fordeling mtp kjønn og innbyggertallgruppe
 ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = Kjønn)) + 
@@ -77,6 +79,12 @@ ggplot(Arbeidsfil1, aes(q8_2Arbeid)) +
   ylab("Prosent")+
   scale_x_discrete(limits = c("1","2","3","4","5","6","7","8")) 
 
+# Lag aldersgruppe
+ggplot(Arbeidsfil1, aes(CatAlder)) + 
+  geom_bar(aes(y = (..count..)/sum(..count..))) + 
+  scale_y_continuous(labels=scales::percent) +
+  ylab("Prosent")+
+  scale_x_discrete(limits = c("<30","31-45","46-66",">67")) 
 
 # Oversikt kj?nn
 tab_Kjønn <- Arbeidsfil1 %>%
@@ -91,39 +99,7 @@ ggplot(Arbeidsfil1, aes(Kjønn)) +
   ylab("Prosent")+
   scale_x_discrete(limits = c("1","2")) 
 
-# Oversikt L?nn
-tab_q8_3Inntekt <- Arbeidsfil1 %>%
-  group_by(q8_3Inntekt) %>%
-  summarize(Freq = n()) %>%
-  mutate(Prop = Freq/sum(Freq)) %>%
-  arrange(desc(Prop))
-tab_q8_3Inntekt
-unique(Arbeidsfil1$q8_3Inntekt)
-tab_q8_3Inntekt$q8_3Inntekt<- factor(tab_q8_3Inntekt$q8_3Inntekt, levels =c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","98","99"))
-ggplot(data = tab_q8_3Inntekt, mapping = aes(x = tab_q8_3Inntekt$q8_3Inntekt, y = Prop)) + 
-  geom_col() + 
-  coord_flip() + 
-  scale_x_discrete(limits = c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","98","99")) # Labels layer omitted
-
-#Oversikt lønnstrinn ift innbyggergruppe - OBS IKKE IFORMATIV. DROPP 
-ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = q8_3Inntekt)) + 
-  geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(q8_3Inntekt)), stat="count") + 
-  scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
-  scale_x_discrete(limits = c("-2499","2500-4900","5000-9999","10000-24999","25000-49999","50000-99999","10000+"))+ #10000+ mangler en null, og bør kanskje stå 1-2499 på første kattegori?
-  scale_fill_discrete(name = "Inntekt")+
-  labs(y = "Prosent")+
-  theme( #ksempler på å "pynte" litt
-    panel.background = element_blank()
-    ,panel.grid.major = element_blank()
-    ,panel.grid.minor = element_blank()
-    ,panel.border = element_blank()
-    ,legend.title = element_text(size=14, face="bold")
-    ,legend.text = element_text(size=14)
-    ,axis.title.x=element_text(size=14) #kan gjøre det samme for y også, samt for tallene på aksen
-  )+
-  theme(axis.line = element_line(color = 'black'))
-
-# Oversikt lønnstrinn 
+# Oversikt lønn
 ggplot(Arbeidsfil1, aes(factor(q8_3Inntekt))) + 
   geom_bar(aes(y = (..count..)/sum(..count..))) + 
   scale_y_continuous(labels=scales::percent) +
@@ -145,7 +121,7 @@ ggplot(Arbeidsfil1, aes(ArtTilstede)) +
   scale_y_continuous(labels=scales::percent) +
   ylab("Prosent")+
   xlab("Observasjon av rovdyr i kommunen")
-scale_x_discrete(limits = c("Ja","Nei")) 
+#scale_x_discrete(limits = c("Ja","Nei")) 
 
 # ArTilstede og innbyggertallgruppe 
 ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = ArtTilstede)) + 
@@ -297,9 +273,8 @@ ggplot(mydata, aes(mydata$q4_10)) +
   facet_wrap(~mydata$q3_1b) 
 
 
-
-# FUNGERE IKKE - FIKS. 
-PtestdataNEP <- NEP[,c("q6_1","q6_2","q6_3","q6_4","q6_5","q6_6","q6_7","median")]
+# Oversikt NEP
+PtestdataNEP <- NEP[,c("q6_1","q6_2","q6_3","q6_4","q6_5","q6_6","q6_7","q6_median")]
 PtestdataNEP [1:8] <- lapply(PtestdataNEP [1:8], factor, levels = 1:5)
 PtestdataNEP_likert<-likert(PtestdataNEP [1:8])
 plot(PtestdataNEP_likert, ordered = FALSE, centered = FALSE, group.order = names(PtestdataNEP [1:8]))
@@ -334,11 +309,15 @@ str(mydata$q4_10)
 #### Tillit - Hva har effekt? ####  
 # tillit til rovviltforskning (q4_10) relatert til hva man synes om rovviltsituasjonen i Norge (q3_1)
 ggplot(Arbeidsfil1,aes(x = factor(q3_1a),fill = factor(q4_10))) + 
-  geom_bar(position = "fill")
+  geom_bar(position = "fill"+
+  labs(y="Proportion") +
+  labs(x= )         )
+
+
+
 # tillit til forskning generelt (q4_3) relatert til hva man synes om rovviltsituasjonen i Norge (q3_1)
 ggplot(Arbeidsfil1,aes(x = factor(q3_1a),fill = factor(q4_3))) + 
   geom_bar(position = "fill")
-
 
 
 ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = q4_10)) + 
@@ -475,12 +454,25 @@ c("q3_1a","q3_1b", "q3_1c", "q3_1d")
 
 # SPM: Den første er ok å se på, men jeg gjør ingen feil ved å gjøre dette? Ser jo at på den neste at antall respodenter er veldig forskjellig"  
 #install.packages("wesanderson")
+
+### Experienced damage ~ Trust carnivore research (proportion)
 ggplot(Arbeidsfil1,aes(q2_6.5,fill = factor(q4_10))) +
   geom_bar(position = "fill") + 
   labs(y = "Proportion") +
-  labs(x = "Experienced damage to property") +
-  scale_fill_brewer(palette = "Paired", name="Trust in carnivore research", labels = c("Fully disagree", "Disagree","Neither nor","Agree","Fully agree"))+
+  labs(x = "No experienced damage to any property") +
+  scale_fill_manual(values = c("red2","lightcoral","gray77","dodgerblue1","blue1"), name="Trust in carnivore research", labels = c("Fully disagree", "Disagree","Neither nor","Agree","Fully agree"))+
   theme( 
+    panel.background = element_blank(),panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.border = element_blank()
+    ,legend.title = element_text(size=14, face="bold") ,legend.text = element_text(size=14) ,axis.title.x=element_text(size=14) ,axis.title.y=element_text(size=14)
+    )+ theme(axis.line = element_line(color = 'black'))
+### Experienced damage ~ Trust carnivore research (percentage)
+ggplot(Arbeidsfil1, aes(q2_6.5, group = q4_10)) + 
+  geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(q4_10)), stat="count") + 
+  scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
+  scale_x_discrete(limits = c("0","1"))+ 
+  scale_fill_discrete(name = "q4_10", labels = c("Fully disagree", "disagree","Neither nor","Agree","Fully agree"))+
+  labs(y = "Prosent")+
+  theme( #ksempler på å "pynte" litt
     panel.background = element_blank()
     ,panel.grid.major = element_blank()
     ,panel.grid.minor = element_blank()
@@ -491,24 +483,44 @@ ggplot(Arbeidsfil1,aes(q2_6.5,fill = factor(q4_10))) +
   )+
   theme(axis.line = element_line(color = 'black'))
   
-ggplot(Arbeidsfil1, aes(q2_6.5, group = q4_10)) + 
-    geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(q4_10)), stat="count") + 
-    scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
-    scale_x_discrete(limits = c("0","1"))+ 
-    scale_fill_discrete(name = "q4_10", labels = c("Fully disagree", "disagree","Neither nor","Agree","Fully agree"))+
-    labs(y = "Prosent")+
-    theme( #ksempler på å "pynte" litt
-      panel.background = element_blank()
-      ,panel.grid.major = element_blank()
-      ,panel.grid.minor = element_blank()
-      ,panel.border = element_blank()
-      ,legend.title = element_text(size=14, face="bold")
-      ,legend.text = element_text(size=14)
-      ,axis.title.x=element_text(size=14) #kan gjøre det samme for y også, samt for tallene på aksen
-    )+
-    theme(axis.line = element_line(color = 'black'))
-  
-  
+
+
+#ggplot(Arbeidsfil1, aes(CatAlder, group = q4_10)) + 
+  geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(q4_10)), stat="count") + 
+  scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
+  scale_x_discrete(limits = c("<30","31-45","46-66",">67"))+ 
+  scale_fill_discrete(name = "q4_10", labels = c("Fully disagree", "disagree","Neither nor","Agree","Fully agree"))+
+  labs(y = "Prosent")+
+  theme( #ksempler på å "pynte" litt
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_blank()
+    ,legend.title = element_text(size=14, face="bold")
+    ,legend.text = element_text(size=14)
+    ,axis.title.x=element_text(size=14) #kan gjøre det samme for y også, samt for tallene på aksen
+  )+
+  theme(axis.line = element_line(color = 'black'))
+#("<30","31-45","46-66",">67")
+
+
+# NEP 
+ggplot(mydata,aes(q6_median,fill = factor(q4_10))) +
+  geom_bar(position = "fill") + 
+  labs(y = "Proportion") +
+  labs(x = "Median NEP score") +
+  scale_fill_manual(values = c("red2","lightcoral","gray77","dodgerblue1","blue1"), name="Trust in carnivore research", labels = c("Fully disagree", "Disagree","Neither nor","Agree","Fully agree"))+
+  theme( 
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_blank()
+    ,legend.title = element_text(size=14, face="bold")
+    ,legend.text = element_text(size=14)
+    ,axis.title.x=element_text(size=14) 
+    ,axis.title.y=element_text(size=14) 
+  )+
+  theme(axis.line = element_line(color = 'black'))  
 
 
 
@@ -540,46 +552,35 @@ Ptestdata[1:5] <- lapply(Ptestdata[1:5], factor, levels = 1:5)
 # Create a likert object
 Ptestdata_likert<-likert(Ptestdata[1:5])
 plot(Ptestdata_likert, ordered = FALSE, group.order = names(Ptestdata[1:5]))
-plot(Ptestdata_likert, ordered = FALSE, centered = FALSE, group.order = names(Ptestdata[1:5]))
-plot(Ptestdata_likert, type = "heat",group.order = names(Ptestdata[1:5]))
+# plot(Ptestdata_likert, ordered = FALSE, centered = FALSE, group.order = names(Ptestdata[1:5]))
+# plot(Ptestdata_likert, type = "heat",group.order = names(Ptestdata[1:5]))
 
 #Forskning generelt
 PtestdataGenerelt <- Arbeidsfil1[,c("q4_1","q4_2","q4_3")]
 
 PtestdataGenerelt<- PtestdataGenerelt %>% 
-  rename(
-    Science_is_important = q4_1,
-    Important_that_people_trust_science = q4_2,
-    Trust_in_general_science = q4_3,
-  )
+  rename(Science_is_important = q4_1, Important_that_people_trust_science = q4_2, Trust_in_general_science = q4_3,)
 PtestdataGenerelt[1:3] <- lapply(PtestdataGenerelt[1:3], factor, levels = 1:5)
 PtestdataGenerelt_likert<-likert(PtestdataGenerelt[1:3])
-plot(PtestdataGenerelt_likert, ordered = FALSE, centered = FALSE, group.order = names(PtestdataGenerelt[1:3]))
+#plot(PtestdataGenerelt_likert, ordered = FALSE, centered = FALSE, group.order = names(PtestdataGenerelt[1:3]))
 plot(PtestdataGenerelt_likert, ordered = FALSE, centered = TRUE, group.order = names(PtestdataGenerelt[1:3]))
 
 # Forskning generelt and sex 
 PtestdataGenerelt <- Arbeidsfil1[,c("Kjønn","q4_1","q4_2","q4_3")]
 PtestdataGenerelt<- PtestdataGenerelt %>% 
-  rename(Science_is_important = q4_1,
-    Important_that_people_trust_science = q4_2,
-    Trust_in_general_science = q4_3,)
+  rename(Science_is_important = q4_1,Important_that_people_trust_science = q4_2,Trust_in_general_science = q4_3,)
 PtestdataGenerelt[2:4] <- lapply(PtestdataGenerelt[2:4], factor, levels = 1:5)
 both_PtestdataGenerelt_likert = likert(PtestdataGenerelt[,c(2:4),drop=FALSE], grouping = PtestdataGenerelt$Kjønn)
 plot(both_PtestdataGenerelt_likert, include.histogram = FALSE)
 plot(both_PtestdataGenerelt_likert, type ="density")
 
-
-
-
 #spesifikk forskning
 PtestdataSpesifikk <- Arbeidsfil1[,c("q4_3","q4_4","q4_5","q4_10")]
 PtestdataSpesifikk<- PtestdataSpesifikk %>% 
-  rename(
-    Tillit_til_forskning_generelt = q4_3,
+  rename(Tillit_til_forskning_generelt = q4_3,
     Tillit_til_medisinsk_forskning = q4_4,
     Tillit_til_klimaforskning = q4_5,
-    Tillit_til_rovviltforskning = q4_10,
-  )
+    Tillit_til_rovviltforskning = q4_10,)
 PtestdataSpesifikk[1:4] <- lapply(PtestdataSpesifikk[1:4], factor, levels = 1:5)
 PtestdataSpesifikk_likert<-likert(PtestdataSpesifikk[1:4])
 plot(PtestdataSpesifikk_likert, ordered = FALSE, centered = FALSE, group.order = names(PtestdataSpesifikk[1:4]))
@@ -599,39 +600,51 @@ PtestdataGenRov<- PtestdataGenRov %>%
   )
 PtestdataGenRov[1:7] <- lapply(PtestdataGenRov[1:7], factor, levels = 1:5)
 PtestdataGenRov_likert<-likert(PtestdataGenRov[1:7])
-plot(PtestdataGenRov_likert, ordered = FALSE, centered = FALSE, group.order = names(PtestdataGenRov[1:7]))
+plot(PtestdataGenRov_likert, ordered = FALSE, centered = TRUE, group.order = names(PtestdataGenRov[1:7]))
 
-plot(both_PtestdataGenerelt_likert, include.histogram = FALSE)
 
 # Forskning generelt and sex 
 names(Arbeidsfil1)
-PtestdataGenRov <- Arbeidsfil1[,c("q4_3","q4_6","q4_7","q4_10","q4_8","q4_9","q4_11","Kjønn","RzoneTilstede","ArtTilstede" )]
+PtestdataGenRov <- Arbeidsfil1[,c("q4_3","q4_6","q4_7","q4_10","q4_8","q4_9","q4_11","Kjønn","RzoneTilstede","ArtTilstede","CatAlder" )]
 PtestdataGenRov<- PtestdataGenRov %>% 
-  rename(Tillit_til_forskning_generelt = q4_3,
-    Gen.forsk_hoy_ekspertise = q4_6,
-    Gen.forsk_hoy_troverdighet = q4_7,
-    Rov.forsk_hoy_ekspertise = q4_8,
-    Rov.forsk_hoy_troverdighet = q4_9,
-    Tillit_til_rovviltforskning = q4_10,
-    Tillit_til_rovviltforskning_som_gen.forsk = q4_11,)
+  rename(Trust_gen.research_generelt = q4_3,
+    Gen.res_high_expertise = q4_6,
+    Gen.res_high_credibility = q4_7,
+    Carn.res_high_expertise = q4_8,
+    Carn.res_high_credibility = q4_9,
+    Carn.res_trust = q4_10,
+    Carn.res_trust_as_Gen.res_trust = q4_11,)
 PtestdataGenRov[1:7] <- lapply(PtestdataGenRov[1:7], factor, levels = 1:5)
 PtestdataGenRov_likert<-likert(PtestdataGenRov[1:7])
-plot(PtestdataGenRov_likert, ordered = FALSE, centered = FALSE, group.order = names(PtestdataGenRov[1:7]))
+plot(PtestdataGenRov_likert, ordered = FALSE, centered = TRUE, group.order = names(PtestdataGenRov[1:7]))
+PtestdataGenRov_likert<-likert(PtestdataGenRov[1,4])
+
 
 both_PtestdataGenRov_likert_sex = likert(PtestdataGenRov[,c(1:7),drop=FALSE], grouping = PtestdataGenRov$Kjønn)
 plot(both_PtestdataGenRov_likert_sex, include.histogram = FALSE)
 plot(both_PtestdataGenRov_likert_sex, type ="density")
+both_PtestdataGenRov_likert_sex = likert(PtestdataGenRov[,c(2,3,5,6),drop=FALSE], grouping = PtestdataGenRov$Kjønn)
+plot(both_PtestdataGenRov_likert_sex, type ="density")
+
 
 # Forskning carnivore and zone tilstede
 both_PtestdataGenRov_likert_RZT = likert(PtestdataGenRov[,c(1:7),drop=FALSE], grouping = PtestdataGenRov$RzoneTilstede)
 plot(both_PtestdataGenRov_likert_RZT, include.histogram = FALSE)
 plot(both_PtestdataGenRov_likert_RZT, type ="density")
 
+
 # Forskning carnivore and Rovvilttilstede
 both_PtestdataGenRov_likert_RT = likert(PtestdataGenRov[,c(1:7),drop=FALSE], grouping = PtestdataGenRov$ArtTilstede)
 plot(both_PtestdataGenRov_likert_RT, include.histogram = FALSE)
 plot(both_PtestdataGenRov_likert_RT, type ="density")
 
+# Forskning carnivore and CatAlder
+both_PtestdataGenRov_likert_CA = likert(PtestdataGenRov[,c(1:7),drop=FALSE], grouping = PtestdataGenRov$CatAlder)
+plot(both_PtestdataGenRov_likert_CA, include.histogram = FALSE)
+plot(both_PtestdataGenRov_likert_CA, type ="density")
+both_PtestdataGenRov_likert_CA = likert(PtestdataGenRov[,c(1,4:6),drop=FALSE], grouping = PtestdataGenRov$CatAlder)
+plot(both_PtestdataGenRov_likert_CA, include.histogram = FALSE)
+plot(both_PtestdataGenRov_likert_CA, type ="density")
 
 
 #### Example of type of plotting ####
