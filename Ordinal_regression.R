@@ -12,26 +12,23 @@ library(Hmisc)
 library(reshape2)
 library(tidyverse)
 
+#str(mydata)
+#table(mydata$q4_10)
+#lapply(mydata[,c("q4_10","Kjønn","q3_1b")], table)
+#str(mydata$q4_10)
 
-str(mydata)
-table(mydata$q4_10)
-lapply(mydata[,c("q4_10","Kjønn","q3_1b")], table)
-str(mydata$q4_10)
-
-ggplot(mydata[1:100,], aes(x = q4_10, y = Folkemengde)) +
-  geom_boxplot(size = .75) +
-  geom_jitter(alpha = .5) +
-  facet_grid(Kjønn ~ ArtTilstede , margins = TRUE) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) # boxplot er vel uaktuelt naar man har 2110 resodenter (her tok jeg bare 100 av de for at det skulle bli leselig, og det kan man jo ikke gjore)
+#ggplot(mydata[1:100,], aes(x = q4_10, y = Folkemengde)) +
+#  geom_boxplot(size = .75) +
+#  geom_jitter(alpha = .5) +
+#  facet_grid(Kjønn ~ ArtTilstede , margins = TRUE) +
+#  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) # boxplot er vel uaktuelt naar man har 2110 resodenter (her tok jeg bare 100 av de for at det skulle bli leselig, og det kan man jo ikke gjore)
 
 
 names(mydata)
 # spørs om man bør endre navn på variabler som har norske bokstaver? Så ikke git lager kvalm med døm? i så fall må det endres i scriptet under. 
 #mydata<- mydata %>% 
-#  rename(
-#    sex = Kjønn)
+#  rename(sex = Kjønn)
 # making factors and ordered factors
-
 mydata$q4_10 <- as.ordered(mydata$q4_10)
 mydata$Kjønn <- as.factor(mydata$Kjønn)
 mydata$q3_1b <- as.ordered(mydata$q3_1b) # obs! 4 betyr vet ikke. Skal den fjernes/endres? hvordan? OG kan vi bruke rank-deficient variables? før warning message. 
@@ -54,16 +51,16 @@ is.na(mydata$q3_1b)
 # Svar: Ok, kunne gjerne trengt hjelp til å sette opp dette? Aldri satt opp loop selv før. 
 
 
-# The model - MASS
+#### The model - MASS ####
 #legger til alle variabler vi �nsker � teste
 
 # Tenker det er greit å bruke AIC som modelseleksjonskriterie her, kjenner du til gangen i det, eller skal jeg sette opp for deg?
-# Svar: Jeg har gjort et slags forsøk, men trenger nok hjelp til dette, ja. 
+# Svar: Jeg har gjort et slags forsøk, men trenger nok hjelp til dette videre. 
 
 # Full model: - obs: får noen warnings, som jeg trenger hjelp til å ordne. "Folkemengde" fungerer f.eks. ikke.  
 m1 <- polr(q4_10~ Alder + Kjønn  + Folkemengde + BefTetthetKommune + Sum.felt.hjortedyr + SausluppetFylke + AntallRartZone + Wolfzone + AntallRArterF + ArtTilstede + q3_1b + q2_6.5 + q2_7.5 + q2_10 , mydata, Hess=TRUE) 
 
-# Hva velger man som vurderingsgrunnlag til å fjerne variabler? p-verdien er jo veldig liten for samtlige?  
+# Spørsmål Hva velger man som vurderingsgrunnlag til å fjerne variabler? p-verdien er jo veldig liten for samtlige?  
 
 # Tester variabler for å se hvilke som ikke fungerer                               
 #ma <- polr(q4_10~ Alder + Kjønn + BefTetthetKommune, mydata, Hess=TRUE) # Folkemengde fungerer ikke - får feilmelding på summary. 
@@ -85,7 +82,7 @@ m1 <- polr(q4_10~ Alder + Kjønn  + Folkemengde + BefTetthetKommune + Sum.felt.h
 summary(m1)
 summary(m1c)
 
-# get coeficients 
+#### get coeficients ####
 (ctable <- coef(summary(mb)))
 p <- pnorm(abs(ctable[,"t value"]), lower.tail = FALSE) * 2
 (ctable <- cbind(ctable, "p value" = p))
@@ -93,7 +90,7 @@ ctable
 (ci <- confint(ma))
 confint.default(ma)
 
-# AIC 
+#### AIC #### 
 AIC (ma)
 AIC (mb)
 AIC (mc)
@@ -105,42 +102,7 @@ drop1(m1a) # naar jeg bruker type="F" saa faar jeg feilmelding. Hva gjoer jeg me
 
 
 
-
-
-# next steps - har ikke sett p� dette enn�. 
-# p-value
-#m1.coef <- data.frame(coef(summary(m1)))
-#m1.coef$pval = round((pnorm(abs(m1.coef$t.value), lower.tail = FALSE) * 2),2)
-#m1.coef
-
-# prediciton 
-#pred <- predict(m1, train[1:5,], type="prob")
-#print(pred, digits = 3)
-
-## Andre ting jeg ikke har sett p� enn� 
-#install.packages("stargazer") ? 
-#library(stargazer)
-#stargazer(m1, type="html", out="m1.htm")
-
-#a way to use the command "factor" 
-#tab_q8_3Inntekt$q8_3Inntekt<- factor(tab_q8_3Inntekt$q8_3Inntekt, levels =c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","98","99"))
-
 # visualising # 
-
-# Hvilke visulariseringsprogrammer pleier du å bruke? ggplot?
 
 # bruke Hmsic for aa sjekke proportion odds assumption? 
 
-
-# for NEP og q3_1 gjennomsnitt og median se OversiktPaper1.R 
-
-#PtestdataNEP <- PtestdataNEP  %>% 
-#  rename(
-#    Tillit_til_forskning_generelt = q4_3,
-#    Gen.forsk_hoy_ekspertise = q4_6,
-#    Gen.forsk_hoy_troverdighet = q4_7,
-#    Rov.forsk_hoy_ekspertise = q4_8,
-#    Rov.forsk_hoy_troverdighet = q4_9,
-#    Tillit_til_rovviltforskning = q4_10,
-#    Tillit_til_rovviltforskning_som_gen.forsk = q4_11,
-#  )
