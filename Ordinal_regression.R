@@ -71,40 +71,41 @@ summary(m1)
 # Tester variabler for å se hvilke som ikke fungerer                               
 #ma <- polr(q4_10~ Alder + Kjønn + BefTetthetKommune, mydata, Hess=TRUE) # Folkemengde fungerer ikke - får feilmelding på summary. 
 #mb <- polr(q4_10~ Alder + Kjønn + BefTetthetKommune + q8_1Utdanning + q8_3Inntekt + q8_4Parti, mydata, Hess=TRUE)
-#mc <- polr(q4_10~ Alder + Kjønn + BefTetthetKommune + Sum.felt.hjortedyr+ AntallRartZone+ Wolfzone + Antallarter + ArtTilstede, mydata, Hess=TRUE) # Inkludering av Sum.felt.hjortedyr gir warning message . In sqrt(diag(vc)) : NaNs produced
+mc <- polr(q4_10~ Alder + Kjønn + BefTetthetKommune + AntallRartZone+ Wolfzone + Antallarter + ArtTilstede, mydata, Hess=TRUE) # Inkludering av Sum.felt.hjortedyr gir warning message . In sqrt(diag(vc)) : NaNs produced
 #md <- polr(q4_10~ Alder + Kjønn + q3_1b + q2_6.5 + q2_7.5 + q2_10 + BefTetthetKommune + Sum.felt.hjortedyr+ AntallRartZone+ Wolfzone + Antallarter + ArtTilstede, mydata, Hess=TRUE) # Inkludering av Sum.felt.hjortedyr gir warning message  + f�r warning message design appears to be rank-deficient, In sqrt(diag(vc)) : NaNs produced
 #me <- polr(q4_10~ Alder + Kjønn + q3_1b + q2_6.5, mydata, Hess = TRUE)  # rank-deficient. 
 #mf <- polr(q4_10~ Alder + Kjønn + q2_6.5, mydata, Hess = TRUE) 
 #mg <- polr(q4_10~ Alder + Kjønn + Folkemengde, mydata, Hess = TRUE)
 #range(mydata$Folkemengde)
 
+# bruker mc videre for å sette opp prosessen bare. 
 #summary(ma)
 #summary(mb)
-#summary(mc)
+summary(mc)
 #summary(mb)
 #summary(md) 
 #summary(me)
-summary(m1)
+#summary(m1)
 
 # eksempel: 
-m1a <- polr(q4_10~ Alder + Kjønn + Folkemengde+  BefTetthetKommune, train, Hess=TRUE) # Folkemengde fungerer ikke - får feilmelding på summary.  
-AIC(m1a)
-drop1(m1a) # naar jeg bruker type="F" saa faar jeg feilmelding. Hva gjoer jeg med dette? Har droppet denne her. 
 
 
 #### get coeficients ####
-(ctable <- coef(summary(mb)))
+(ctable <- coef(summary(mc)))
 p <- pnorm(abs(ctable[,"t value"]), lower.tail = FALSE) * 2
 (ctable <- cbind(ctable, "p value" = p))
 ctable
-(ci <- confint(ma))
-confint.default(ma)
+(ci <- confint(mc))
+confint.default(mc)
 
 
 #### AIC #### 
-AIC (m1)
-AIC (mb)
-AIC (mc)
+AIC(mc)
+drop1(mc, type=F)  
+mc2 <- polr(q4_10~ AntallRartZone+ Wolfzone + ArtTilstede, mydata, Hess=TRUE)# remove variables that are more than 2 AIC-values larger than the smallest one. 
+drop1(mc2, type=F)
+# Kommentar: Dette kan ikke være riktig måte å gjøre det på. Hva gjør egt. drop1? 
+
 
 
 
