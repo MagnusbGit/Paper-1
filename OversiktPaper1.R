@@ -176,9 +176,82 @@ ggplot(Arbeidsfil1, aes(factor(q4_10))) +
 # ... eller blir det ikke like beskrivende som jeg tror uansett. 
 
 
+# Det er mulig, tenker du da feks på hvor stor andel av de som er i hver kattegori (q4_10) som også er i den andre kattegorien (q4_3) men mulig det blir litt rotete/mye info i samme plot?
+#alla dette (forskjellige eksempler/tilnærminger med facet_grid)?
+ggplot(Arbeidsfil1, aes(factor(q4_10), group = q4_3)) + 
+  geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(q4_3)), stat="count") +
+  scale_y_continuous(labels=scales::percent, limits = c(0,0.5)) +
+  scale_fill_discrete(name = "Trust in science in general", labels = c(1,2,3,4,5))+
+  labs(y = "Percentage")+
+  labs(x = "Trust in carnivore research")+
+  theme( 
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_rect(fill=NA,linetype = "dashed", colour = "black")
+    ,axis.title.y=element_text(size=14) #kan gjøre det samme for x også, samt for tallene på aksen
+    ,axis.title.x=element_text(size=14) #kan gjøre det samme for x også, samt for tallene på aksen
+  )+
+  theme(axis.line = element_line(color = 'black'))+
+  facet_grid(ArtTilstede ~ .)
+
+#Eller motsatt
+ggplot(Arbeidsfil1, aes(factor(q4_3), group = q4_10)) + 
+  geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(q4_10)), stat="count") +
+  scale_y_continuous(labels=scales::percent, limits = c(0,0.5)) +
+  scale_fill_discrete(name = "Trust in carnivore research", labels = c(1,2,3,4,5))+
+  labs(y = "Percentage")+
+  labs(x = "Trust in science in general")+
+  theme( 
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_rect(fill=NA,linetype = "dashed", colour = "black")
+    ,axis.title.y=element_text(size=14) #kan gjøre det samme for x også, samt for tallene på aksen
+    ,axis.title.x=element_text(size=14) #kan gjøre det samme for x også, samt for tallene på aksen
+  )+
+  theme(axis.line = element_line(color = 'black'))+
+  facet_grid(.~ArtTilstede)#Side ved side
+
+#Eventuelt sånn her?
+ggplot(Arbeidsfil1, aes(factor(q4_10))) + 
+  geom_bar(aes(y = (..count..)/sum(..count..))) + 
+  scale_y_continuous(labels=scales::percent, limits = c(0,0.5)) +
+  ylab("Percentage")+
+  labs(x = "Trust in carnivore research")+
+  theme( 
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_rect(fill=NA,linetype = "dashed", colour = "black")
+    ,axis.title.y=element_text(size=14) #kan gjøre det samme for x også, samt for tallene på aksen
+    ,axis.title.x=element_text(size=14) #kan gjøre det samme for x også, samt for tallene på aksen
+  )+
+  theme(axis.line = element_line(color = 'black'))+
+  facet_grid(ArtTilstede ~ factor(q4_3))
+
+ggplot(Arbeidsfil1, aes(factor(q4_3), group = ArtTilstede)) + 
+  geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(ArtTilstede)), stat="count") +
+  scale_y_continuous(labels=scales::percent, limits = c(0,0.5)) +
+  scale_fill_discrete(name = "Trust in carnivore research", labels = c(1,2,3,4,5))+
+  labs(y = "Percentage")+
+  labs(x = "Trust in science in general")+
+  theme( 
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_rect(fill=NA,linetype = "dashed", colour = "black")
+    ,axis.title.y=element_text(size=14) #kan gjøre det samme for x også, samt for tallene på aksen
+    ,axis.title.x=element_text(size=14) #kan gjøre det samme for x også, samt for tallene på aksen
+  )+
+  theme(axis.line = element_line(color = 'black'))+
+  facet_grid(.~q4_10)#Side ved side
+#########################################################
+
 ####  NEP and q3_1 calc #### 
 #  NEP - reverse values and calculate mean. Median to? 
-mydata <- read.csv(file="DatasetSpørreundersøkelseOkt2019.csv",header=T,sep=";")
+# If you want...
+mydata <-read.csv("~/DIV NINA/DatasetSpørreundersøkelseOkt2019.csv",header=T,sep=";",dec = "," ,na.strings = "")
 NEP<-mydata[,c("RESPID","q6_1","q6_2","q6_3","q6_4","q6_5","q6_6","q6_7")]
 NEP2<-NEP[2:8]
 keys <- c(1,1,-1,1,-1,1,-1)  #reverse the 3rd, 5th and 7th items
@@ -231,10 +304,13 @@ mydata<-cbind(mydata,RovviltsituasjonN2)
 PtestdataNEP <- NEP[,c("q6_1","q6_2","q6_3","q6_4","q6_5","q6_6","q6_7","q6_median")]
 PtestdataNEP [1:8] <- lapply(PtestdataNEP [1:8], factor, levels = 1:5)
 PtestdataNEP_likert<-likert(PtestdataNEP [1:8])
-plot(PtestdataNEP_likert, ordered = FALSE, centered = FALSE, group.order = names(PtestdataNEP [1:8]))
+plot(PtestdataNEP_likert, ordered = FALSE, centered = FALSE, group.order = names(PtestdataNEP [1:8])) # Synes det så litt rart ut med prosent før og etter søyla, gir pakka mulighet for å ta det inne i alle søylene?
 
 # NEP median
 
+####
+# Komentar fra km: Tenker det kan være ryddigere plot hvis man deler inn i 3 grupper i svarene (enig/hverken eller/uenig)
+###
 ggplot(mydata,aes(q6_median,fill = factor(q4_10))) +
   geom_bar(position = "fill") + 
   labs(y = "Proportion") +
@@ -254,17 +330,22 @@ ggplot(mydata,aes(q6_median,fill = factor(q4_10))) +
 
 
 # Oversikt Attitude toward carnivores: OBS! Eliminate 4!. HVordangjøres dette for gjennomsnitt da man har flere verdier? Må kanskje gjøres før beregning av snitt, men hvordan?
-mydata$q3_1a[mydata$q3_1a==4] <- NA
-mydata$q3_1b[mydata$q3_1b==4] <- NA
-mydata$q3_1c[mydata$q3_1c==4] <- NA
-mydata$q3_1d[mydata$q3_1d==4] <- NA
-is.na(mydata$q3_1a)
+## Svar km: Skjønte ikke helt hva du mente he, hvis du bare vil ha det ut av plottet, så er det greit å ta ut i etterkant og kan gjøres direkte i plottfunksjonen, men om det er et poeng i forhold til beregning av snitt, så må det bort før beregningen ja?
+# Det du har gjort under er jo en grei måte.
+#mydata$q3_1a[mydata$q3_1a==4] <- NA
+#mydata$q3_1b[mydata$q3_1b==4] <- NA
+#mydata$q3_1c[mydata$q3_1c==4] <- NA
+#mydata$q3_1d[mydata$q3_1d==4] <- NA
+#is.na(mydata$q3_1a)
 
-ggplot(mydata, aes(mydata$q3_1average)) + 
-  geom_bar(aes(y = (..count..)/sum(..count..))) + 
-  scale_y_continuous(labels=scales::percent) +
-  ylab("Prosent")+
-  scale_x_discrete(limits = c("1","2","3","4","5")) 
+#Hvis du vil filtrere data uten å slette de i datasettet kan du eventuelt bruke dplyr, ser ut som du er vandt med det(?):
+mydata%>%
+filter_at(vars(q3_1a, q3_1b,q3_1c,q3_1d), all_vars(.>=1 & .<=3))%>%#Viser bare data mellom 1 og 3 for variablene over
+  ggplot(aes(q3_1average)) + 
+    geom_bar(aes(y = (..count..)/sum(..count..))) + 
+    scale_y_continuous(labels=scales::percent) +
+    ylab("Prosent")+
+    scale_x_discrete(limits = c("1","2","3","4")) 
 
 
 ggplot(mydata, aes(mydata$q3_1b)) + 
@@ -477,6 +558,8 @@ c("q3_1a","q3_1b", "q3_1c", "q3_1d")
 # SPM: Den første er ok å se på, men jeg gjør ingen feil ved å gjøre dette? Ser jo at på den neste at antall respodenter er veldig forskjellig"  
 #install.packages("wesanderson")
 
+## Svar km: mener du det under? Du snakker jo isåfall om andeler, så ikke feil, må bare presisere at det er andel innenfor hver gruppe.
+
 ### Experienced damage ~ Trust carnivore research (proportion)
 mydata$q2_6.5[mydata$q2_6.5==0] <- "Damage"
 mydata$q2_6.5[mydata$q2_6.5==1] <- "Not damage"
@@ -492,7 +575,7 @@ ggplot(mydata,aes(factor(q2_6.5),fill = factor(q4_10))) +
   theme( 
     panel.background = element_blank(),panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.border = element_blank()
     ,legend.title = element_text(size=14, face="bold") ,legend.text = element_text(size=14) ,axis.title.x=element_text(size=14) ,axis.title.y=element_text(size=14)
-    )+ theme(axis.line = element_line(color = 'black'))
+  )+ theme(axis.line = element_line(color = 'black'))
 mydata$q2_6.5[mydata$q2_6.5=="Damage"] <- 0 
 mydata$q2_6.5[mydata$q2_6.5== "Not damage"] <- 1
 ### Experienced damage ~ Trust carnivore research (percentage)
@@ -512,7 +595,7 @@ ggplot(Arbeidsfil1, aes(q2_6.5, group = q4_10)) +
     ,axis.title.x=element_text(size=14) #kan gjøre det samme for y også, samt for tallene på aksen
   )+
   theme(axis.line = element_line(color = 'black'))
-  
+
 
 
 ggplot(Arbeidsfil1, aes(CatAlder, group = q4_10)) + 
@@ -532,8 +615,6 @@ ggplot(Arbeidsfil1, aes(CatAlder, group = q4_10)) +
   )+
   theme(axis.line = element_line(color = 'black'))
 #("<30","31-45","46-66",">67")
-
-
 
 
 #positionsI <- c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","98","99")
