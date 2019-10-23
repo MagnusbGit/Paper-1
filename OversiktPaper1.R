@@ -590,10 +590,10 @@ plot(both_PtestdataGenerelt_likert, type ="density")
 #spesifikk forskning
 PtestdataSpesifikk <- Arbeidsfil1[,c("q4_3","q4_4","q4_5","q4_10")]
 PtestdataSpesifikk<- PtestdataSpesifikk %>% 
-  rename(Tillit_til_forskning_generelt = q4_3,
-    Tillit_til_medisinsk_forskning = q4_4,
-    Tillit_til_klimaforskning = q4_5,
-    Tillit_til_rovviltforskning = q4_10,)
+  rename(General_science = q4_3,
+    Medical_research = q4_4,
+    Climate_research = q4_5,
+    Carnivore_research = q4_10,)
 PtestdataSpesifikk[1:4] <- lapply(PtestdataSpesifikk[1:4], factor, levels = 1:5)
 PtestdataSpesifikk_likert<-likert(PtestdataSpesifikk[1:4])
 plot(PtestdataSpesifikk_likert, ordered = FALSE, centered = FALSE, group.order = names(PtestdataSpesifikk[1:4]))
