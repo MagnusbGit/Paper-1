@@ -49,7 +49,7 @@ is.na(mydata$q3_1b)
 #Det er et poeng for � validere modellen, men tror vi kj�rer all data inn i modelleringen her siden vi ikke har s� mye data i utgangspunktet. Vi m�tte is�fall ha gjort et utvalg innenfor hver kommune ja (om vi tenker at respondentene har en n�stet i kommune). 
 # Det kan i s�fall enkelt gj�res ved � kj�re funksjonen i linje 37 i en loop som indekserer p� kommune.
 # Svar: Ok, kunne gjerne trengt hjelp til å sette opp dette? Aldri satt opp loop selv før. 
-
+# Oppgave jeg maa gjoere: Sett opp loop
 
 #### The model - MASS ####
 #legger til alle variabler vi �nsker � teste
@@ -58,8 +58,14 @@ is.na(mydata$q3_1b)
 # Svar: Jeg har gjort et slags forsøk, men trenger nok hjelp til dette videre. 
 
 # Full model: - obs: får noen warnings, som jeg trenger hjelp til å ordne. "Folkemengde" fungerer f.eks. ikke.  
-m1 <- polr(q4_10~ Alder + Kjønn  + Folkemengde + BefTetthetKommune + Sum.felt.hjortedyr + SausluppetFylke + AntallRartZone + Wolfzone + AntallRArterF + ArtTilstede + q3_1b + q2_6.5 + q2_7.5 + q2_10 , mydata, Hess=TRUE) 
+#m1 <- polr(q4_10~ Alder + Kjønn  + Folkemengde + BefTetthetKommune + Sum.felt.hjortedyr + SausluppetFylke + AntallRartZone + Wolfzone + AntallRArterF + ArtTilstede + q3_1b + q2_6.5 + q2_7.5 + q2_10 , mydata, Hess=TRUE) 
+range(mydata$Sum.felt.hjortedyr)
+unique(mydata$Sum.felt.hjortedy)
+mydata$Sum.felt.hjortedy <- 
 
+  
+m1 <- polr(q4_10~ Alder + Kjønn + BefTetthetKommune + Sum.felt.hjortedyr + SausluppetFylke + AntallRartZone + Wolfzone + AntallRArterF + ArtTilstede + q3_1b + q2_6.5 + q2_7.5 + q2_10 , mydata, Hess=TRUE) 
+summary(m1)
 # Spørsmål Hva velger man som vurderingsgrunnlag til å fjerne variabler? p-verdien er jo veldig liten for samtlige?  
 
 # Tester variabler for å se hvilke som ikke fungerer                               
@@ -78,9 +84,13 @@ m1 <- polr(q4_10~ Alder + Kjønn  + Folkemengde + BefTetthetKommune + Sum.felt.h
 #summary(mb)
 #summary(md) 
 #summary(me)
-
 summary(m1)
-summary(m1c)
+
+# eksempel: 
+m1a <- polr(q4_10~ Alder + Kjønn + Folkemengde+  BefTetthetKommune, train, Hess=TRUE) # Folkemengde fungerer ikke - får feilmelding på summary.  
+AIC(m1a)
+drop1(m1a) # naar jeg bruker type="F" saa faar jeg feilmelding. Hva gjoer jeg med dette? Har droppet denne her. 
+
 
 #### get coeficients ####
 (ctable <- coef(summary(mb)))
@@ -90,19 +100,15 @@ ctable
 (ci <- confint(ma))
 confint.default(ma)
 
+
 #### AIC #### 
-AIC (ma)
+AIC (m1)
 AIC (mb)
 AIC (mc)
 
-# eksempel: 
-m1a <- polr(q4_10~ Alder + Kjønn + Folkemengde+  BefTetthetKommune, train, Hess=TRUE) # Folkemengde fungerer ikke - får feilmelding på summary.  
-AIC(m1a)
-drop1(m1a) # naar jeg bruker type="F" saa faar jeg feilmelding. Hva gjoer jeg med dette? Har droppet denne her. 
 
 
-
-# visualising # 
+#### visualising #### 
 
 # bruke Hmsic for aa sjekke proportion odds assumption? 
 
