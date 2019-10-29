@@ -252,6 +252,8 @@ ggplot(Arbeidsfil1, aes(factor(q4_3), group = ArtTilstede)) +
 #  NEP - reverse values and calculate mean. Median to? 
 # If you want...
 mydata <-read.csv("~/DIV NINA/DatasetSpørreundersøkelseOkt2019.csv",header=T,sep=";",dec = "," ,na.strings = "")
+mydata <- read.csv(file="DatasetSpørreundersøkelseOkt2019.csv",header=T,sep=";")
+
 NEP<-mydata[,c("RESPID","q6_1","q6_2","q6_3","q6_4","q6_5","q6_6","q6_7")]
 NEP2<-NEP[2:8]
 keys <- c(1,1,-1,1,-1,1,-1)  #reverse the 3rd, 5th and 7th items
@@ -290,10 +292,10 @@ head(RovviltsituasjonN)
 
 RovviltsituasjonNH<-mydata[,c("RESPID",c("q3_2a","q3_2b", "q3_2c", "q3_2d") )]
 head(RovviltsituasjonNH)
-RovviltsituasjonNH$q3_1averageH <- rowMeans(RovviltsituasjonNH[2:5], na.rm=TRUE)
+RovviltsituasjonNH$q3_2average <- rowMeans(RovviltsituasjonNH[2:5], na.rm=TRUE)
 RovviltsituasjonN2H<-RovviltsituasjonNH %>% 
   rowwise() %>% 
-  mutate(q3_1medianH = median(c(q3_2a,q3_2b, q3_2c, q3_2d), na.rm = FALSE))
+  mutate(q3_2median = median(c(q3_2a,q3_2b, q3_2c, q3_2d), na.rm = FALSE))
 RovviltsituasjonN3H<-RovviltsituasjonN2H[,7]
 RovviltsituasjonNH<- cbind(RovviltsituasjonNH,RovviltsituasjonN3H)
 RovviltsituasjonN2H<-RovviltsituasjonNH[,6:7]
