@@ -29,7 +29,7 @@ library(sqldf)
 library(RColorBrewer)
 library(ggthemes)
 library(stringr)
-library(wesanderson)
+
 # Load data
 setwd("C:/Users/magnusb/Filr/My Files/Oppgave/Data spørreundersøkelse/RETTredigert/Arbeidsfil Paper 1")
 Arbeidsfil1 <- read.csv(file="DatasetSpørreundersøkelseOkt2019.csv",header=T,sep=";")
@@ -288,10 +288,22 @@ RovviltsituasjonN<- cbind(RovviltsituasjonN,RovviltsituasjonN3)
 RovviltsituasjonN2<-RovviltsituasjonN[,6:7]
 head(RovviltsituasjonN)
 
+RovviltsituasjonNH<-mydata[,c("RESPID",c("q3_2a","q3_2b", "q3_2c", "q3_2d") )]
+head(RovviltsituasjonNH)
+RovviltsituasjonNH$q3_1averageH <- rowMeans(RovviltsituasjonNH[2:5], na.rm=TRUE)
+RovviltsituasjonN2H<-RovviltsituasjonNH %>% 
+  rowwise() %>% 
+  mutate(q3_1medianH = median(c(q3_2a,q3_2b, q3_2c, q3_2d), na.rm = FALSE))
+RovviltsituasjonN3H<-RovviltsituasjonN2H[,7]
+RovviltsituasjonNH<- cbind(RovviltsituasjonNH,RovviltsituasjonN3H)
+RovviltsituasjonN2H<-RovviltsituasjonNH[,6:7]
+head(RovviltsituasjonNH)
+
+
 # include NEP and q3_1 averages and medians into mydata
 mydata<-cbind(mydata,NEP2)
 mydata<-cbind(mydata,RovviltsituasjonN2)
-
+mydata<-cbind(mydata,RovviltsituasjonN2H)
 #### NEP and q3_1 #### 
 # make table of NEP
 #tab_q3_1avg <- mydata %>%
