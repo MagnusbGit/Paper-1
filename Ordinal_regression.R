@@ -54,7 +54,6 @@ is.na(mydata$q3_1b)
 
 ##KM: HMMM, tror ikke jeg husker helt hva vi skulle sette opp loop på, er det blitt borte?
 #loop kan settes opp på flere måter, men den enkleste (og tregeste hvis det er mye data) er en for-loop. Er det mye data så pleier jeg å bruke data.table-pakka, men den tar det ofte litt lengere tid å bli dus på
-
 #generelt kan en for-loop for å indeksere på en faktor settes opp sånn
 for(i in levels(faktor))
 {                                          
@@ -67,13 +66,13 @@ for(i in levels(faktor))
 }
 keep.Z
 
-# Man kan gjøre slik for å hente ut to rader fra samme kommuner: 
+#MB: Man kan vel gjoere slik for aa hente ut to rader fra samme kommuner: 
 for(i in levels(mydata$Kommune))
 {                                          
   test.data <- mydata %>% group_by(Kommune) %>% sample_n(size = 2)
 }
-# skal man ha inn en test inn i denne, slik som under? (bortsett fra at jeg ikke helt forstod hvordan dette skulle gjoeres så den er helt feil saa langt)
-# men tror jeg trenger hjelp til aa forstaa hva vi oensker aa oppnaa
+#MB: skal man ha inn en test inn i denne, slik som under? (bortsett fra at jeg ikke helt forstod hvordan dette skulle gjoeres så den er helt feil saa langt)
+#MB: men tror jeg trenger hjelp til aa forstaa hva vi oensker aa oppnaa
 for(i in levels(mydata$Kommune))
 {                                          
   test.data <- mydata %>% group_by(Kommune) %>% sample_n(size = 2)
@@ -81,14 +80,16 @@ for(i in levels(mydata$Kommune))
   keep.Z<-cbind(keep.Z,cr$est)
 }
 keep.Z
-# ser ogsaa at det er mange forskjellige maater aa gjoere det paa.
-# .. som LOOCV og k-fold. Er det den sistnevte vi gjoer bare at vi passer paa aa alltid ha med f.eks. 3 av samme kommune i trainingsettet og 2 i test?
+# MB: ser ogsaa at det er mange forskjellige maater aa gjoere det paa.
+# MB: .. som LOOCV og k-fold. Er det den sistnevte vi gjoer bare at vi passer paa aa alltid ha med f.eks. 3 av samme kommune i trainingsettet og 2 i test?
 
 mydata2
 test.data
 str(test.data)
 str(mydata)
-#### MASS ####
+
+
+#### Modeller ####
 #legger til alle variabler vi �nsker � teste
 
 #Dataene trengs nok å skaleres eller sentres, se hvordan det ser ut med og uten en log-transformasjon feks
@@ -103,13 +104,15 @@ m1 <- polr(q4_10~ Alder + Kjønn +log(Folkemengde) +BefTetthetKommune + log(Sum.
 summary(m1)
 #Du får rank-deficient modell her fordi vi putter for mange variable inn for å forklare variasjonen. 
 
-# Spørsmål Hva velger man som vurderingsgrunnlag til å fjerne variabler? p-verdien er jo veldig liten for samtlige?
+#MB: Spørsmål Hva velger man som vurderingsgrunnlag til å fjerne variabler? p-verdien er jo veldig liten for samtlige?
 ## Svar: Det er litt forskjellige tilnærminger her, en måte er å sette opp alle mulige modeller for så å gjøre en model_average basert på disse
 #så slutt-modellen er altså en sammensettning av alle modellene, men vekte basert på AIC-verdier, og hva disse modellene inneholder. 
 #En anne måte er å sette opp en modell med alle variable vi tror gir mening, og bare oppgi denne. og en annen er igjen å finne den "enkleste" modellen basert på noen seleksjonsmetode.
 #Det man kan gjøre er å sette opp feks 10 kandidatmodeller, som vi har trua på med tanke på vraiable-kombinasjoner, og så sette disse opp mot hverandre og sjekke forskjeller i AIC-verdier
+#MB: Jeg tenkte foerst vi burde proeve aa selektere basert paa kandidatmodeller. Men er det ikke en del kritikk ift bruk av stepwise selection ogsaa? 
+# MB: er det noe problem aa gjoere begge varianter som du nevner?
 
-# Tester variabler for å se hvilke som ikke fungerer                               
+#### Alternative modeller ####                             
 #ma <- polr(q4_10~ Alder + Kjønn + BefTetthetKommune, mydata, Hess=TRUE) # Folkemengde fungerer ikke - får feilmelding på summary. 
 #mb <- polr(q4_10~ Alder + Kjønn + BefTetthetKommune + q8_1Utdanning + q8_3Inntekt + q8_4Parti, mydata, Hess=TRUE)
 mc <- polr(q4_10~ log(Folkemengde)+Alder + Kjønn + BefTetthetKommune + AntallRartZone+ Wolfzone + Antallarter + ArtTilstede, mydata, Hess=TRUE) # Inkludering av Sum.felt.hjortedyr gir warning message . In sqrt(diag(vc)) : NaNs produced
@@ -118,6 +121,27 @@ mc <- polr(q4_10~ log(Folkemengde)+Alder + Kjønn + BefTetthetKommune + AntallRa
 #mf <- polr(q4_10~ Alder + Kjønn + q2_6.5, mydata, Hess = TRUE) 
 #mg <- polr(q4_10~ Alder + Kjønn + Folkemengde, mydata, Hess = TRUE)
 #range(mydata$Folkemengde)
+
+#### averaging ####
+#m1 <- polr(q4_10~ Alder + Kjønn + q3_1b + q2_6.5 + q2_7.5 + q2_10 + BefTetthetKommune + Sum.felt.hjortedyr+ AntallRartZone+ Wolfzone + Antallarter + ArtTilstede, mydata, Hess=TRUE) # Inkludering av Sum.felt.hjortedyr gir warning message  + f�r warning message design appears to be rank-deficient, In sqrt(diag(vc)) : NaNs produced
+names(mydata)
+mSE <-polr(q4_10~ Alder + Kjønn + log(Folkemengde) + BefTetthetKommune + q8_1Utdanning + q8_2Arbeid + q8_3Inntekt + q8_4Parti, mydata, Hess =T)
+mR <- polr(q4_10~ Bearzone + Wolfzone +  + BefTetthetKommune + q8_1Utdanning + q8_2Arbeid + q8_3Inntekt + q8_4Parti, mydata, Hess =T)
+mByland <- polr(q4_10~ Alder + Kjønn + log(Folkemengde) + BefTetthetKommune + q8_1Utdanning + q8_2Arbeid + q8_3Inntekt + q8_4Parti, mydata, Hess =T)
+mJ <- polr(q4_10~ Alder + , mydata, Hess =T) # Jegertradisjoner
+mD <-  # Damage , kanskje pluss jeger? 
+mkombi <- #
+mkombi2 <- # 
+
+#### selection ####
+
+
+
+
+
+ 
+
+#### EKSTRA UNDER - ikke byr oss enda ####
 
 # bruker mc videre for å sette opp prosessen bare. 
 #summary(ma)
