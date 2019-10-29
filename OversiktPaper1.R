@@ -230,10 +230,11 @@ ggplot(Arbeidsfil1, aes(factor(q4_10))) +
   theme(axis.line = element_line(color = 'black'))+
   facet_grid(ArtTilstede ~ factor(q4_3))
 
+# Er den under riktig? 
 ggplot(Arbeidsfil1, aes(factor(q4_3), group = ArtTilstede)) + 
   geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(ArtTilstede)), stat="count") +
   scale_y_continuous(labels=scales::percent, limits = c(0,0.5)) +
-  scale_fill_discrete(name = "Trust in carnivore research", labels = c(1,2,3,4,5))+
+  scale_fill_discrete(name = "Art til stede", labels = c(1,2))+
   labs(y = "Percentage")+
   labs(x = "Trust in science in general")+
   theme( 
@@ -324,6 +325,8 @@ plot(PtestdataNEP_likert, ordered = FALSE, centered = FALSE, group.order = names
 
 ####
 # Komentar fra km: Tenker det kan være ryddigere plot hvis man deler inn i 3 grupper i svarene (enig/hverken eller/uenig)
+# MB Svar: Det har du sikkert rett i, men tror kanskje jeg synes at de plottene som går sideveis og er sentrert er mest oversiktelig. 
+# Har du forslag til hvordan jeg kan plotte denne lik de plottene brukt for hvert spørsmål bare ved hjelp av ggplot, så jeg har mer kontroll over labels og sånn? Har lyst at de skal ligne mer på de andre vi har laget over. 
 ###
 ggplot(mydata,aes(q6_median,fill = factor(q4_10))) +
   geom_bar(position = "fill") + 
@@ -342,6 +345,41 @@ ggplot(mydata,aes(q6_median,fill = factor(q4_10))) +
   )+
   theme(axis.line = element_line(color = 'black'))  
 
+# trenger ikke denne her, men kanskje en anna plass - reduser antall kategorier i q6median ved aa lage ny variabel
+str(mydata$q6_median)
+mydata$q6_medianC <- factor(mydata$q6_median)
+str(mydata$q6_medianC)
+new.levels <- c(1,1,2,3,3)
+mydata$q6_medianC <- factor(new.levels[mydata$q6_medianC])
+str(mydata$q6_median)
+str(mydata$q6_medianC)
+
+# reduser antall kategorier i q4_10 ved aa lage ny variabel
+str(mydata$q4_10)
+mydata$q4_10C <- factor(mydata$q4_10)
+str(mydata$q4_10)
+new.levels <- c(1,1,2,3,3)
+mydata$q4_10C <- factor(new.levels[mydata$q4_10])
+str(mydata$q4_10)
+str(mydata$q4_10C)
+
+# MB: Denne (under) er kanskje bedre, men ikke helt fornoyd. Kan man vise denne med sentrerte soyler? Ligne mer på de andre
+ggplot(mydata,aes(mydata$q6_median,fill = q4_10C)) +
+  geom_bar(position = "fill") + 
+  labs(y = "Proportion") +
+  labs(x = "Median NEP score") +
+  scale_fill_manual(values = c("lightcoral","gray77","dodgerblue1"), name="Trust in carnivore research", labels = c("Fully disagree/Disagree","Neither nor","Agree/Fully agree"))+
+  theme( 
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_blank()
+    ,legend.title = element_text(size=14, face="bold")
+    ,legend.text = element_text(size=14)
+    ,axis.title.x=element_text(size=14) 
+    ,axis.title.y=element_text(size=14) 
+  )+
+  theme(axis.line = element_line(color = 'black'))  
 
 # Oversikt Attitude toward carnivores: OBS! Eliminate 4!. HVordangjøres dette for gjennomsnitt da man har flere verdier? Må kanskje gjøres før beregning av snitt, men hvordan?
 ## Svar km: Skjønte ikke helt hva du mente he, hvis du bare vil ha det ut av plottet, så er det greit å ta ut i etterkant og kan gjøres direkte i plottfunksjonen, men om det er et poeng i forhold til beregning av snitt, så må det bort før beregningen ja?
@@ -421,6 +459,7 @@ ggplot(Arbeidsfil1,aes(x = factor(q3_1b),fill = factor(q4_3))) +
 #    Do_not_know = <NA>
 #  )
 
+#MB: Endre slik at den ligner mer på de foerste som er sentrerte? 
 ggplot(mydata,aes(factor(q3_1b),fill = factor(q4_10))) +
   geom_bar(position = "fill") + 
   labs(y = "Proportion") +
@@ -438,6 +477,22 @@ ggplot(mydata,aes(factor(q3_1b),fill = factor(q4_10))) +
   )+
   theme(axis.line = element_line(color = 'black'))  
 
+ggplot(mydata,aes(factor(q3_1b),fill = factor(q4_10C))) +
+  geom_bar(position = "fill") + 
+  labs(y = "Proportion") +
+  labs(x = "Thoughts on wolf situation") +
+  scale_fill_manual(values = c("lightcoral","gray77","dodgerblue1"), name="Trust in carnivore research", labels = c("Fully disagree/Disagree","Neither nor","Agree/Fully agree"))+
+  theme( 
+    panel.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.border = element_blank()
+    ,legend.title = element_text(size=14, face="bold")
+    ,legend.text = element_text(size=14)
+    ,axis.title.x=element_text(size=14) 
+    ,axis.title.y=element_text(size=14) 
+  )+
+  theme(axis.line = element_line(color = 'black'))  
 
 ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = q4_10)) + 
   geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(q4_10)), stat="count") + 
@@ -590,6 +645,19 @@ ggplot(mydata,aes(factor(q2_6.5),fill = factor(q4_10))) +
     panel.background = element_blank(),panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.border = element_blank()
     ,legend.title = element_text(size=14, face="bold") ,legend.text = element_text(size=14) ,axis.title.x=element_text(size=14) ,axis.title.y=element_text(size=14)
   )+ theme(axis.line = element_line(color = 'black'))
+
+ggplot(mydata,aes(factor(q2_6.5),fill = factor(q4_10C))) +
+  geom_bar(position = "fill") + 
+  labs(y = "Proportion") +
+  labs(x = "Experienced damage to property") +
+  scale_fill_manual(values = c("lightcoral","gray77","dodgerblue1"), name="Trust in carnivore research", labels = c("Fully disagree/Disagree","Neither nor","Agree/Fully agree"))+
+  theme( 
+    panel.background = element_blank(),panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.border = element_blank()
+    ,legend.title = element_text(size=14, face="bold") ,legend.text = element_text(size=14) ,axis.title.x=element_text(size=14) ,axis.title.y=element_text(size=14)
+  )+ theme(axis.line = element_line(color = 'black'))
+
+
+
 mydata$q2_6.5[mydata$q2_6.5=="Damage"] <- 0 
 mydata$q2_6.5[mydata$q2_6.5== "Not damage"] <- 1
 ### Experienced damage ~ Trust carnivore research (percentage)
