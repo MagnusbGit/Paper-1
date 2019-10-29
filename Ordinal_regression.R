@@ -113,25 +113,45 @@ summary(m1)
 # MB: er det noe problem aa gjoere begge varianter som du nevner?
 
 #### Alternative modeller ####                             
+# SPM: Boer vi gruppere dem inn i temaer? Eller boer jeg velge ut den modellen jeg har best tro paa paa tvers av "tema"? 
+#m1 <- polr(q4_10~ Alder + Kjønn + q3_1b + q2_6.5 + q2_7.5 + q2_10 + BefTetthetKommune + Sum.felt.hjortedyr+ AntallRartZone+ Wolfzone + Antallarter + ArtTilstede, mydata, Hess=TRUE) # Inkludering av Sum.felt.hjortedyr gir warning message  + f�r warning message design appears to be rank-deficient, In sqrt(diag(vc)) : NaNs produced
+names(mydata)
+# hva skjer om jeg gjoer q4
+mSE <-polr(q4_10~ Alder + Kjønn + log(Folkemengde) + BefTetthetKommune + q8_1Utdanning + q8_2Arbeid + q8_3Inntekt + q8_4Parti, mydata, Hess =T)
+mR <- polr(q4_10~ Bearzone + Wolfzone + Lynxzone + Wolverinezone + AntallRartZone +RzoneTilstede+bjørn+gaupe+jerv+ulv+Antallarter+ArtTilstede, mydata, Hess =T) # DROPP VARIABLER
+mByland <- polr(q4_10~ Alder + Kjønn + log(Folkemengde) + BefTetthetKommune + q8_1Utdanning + q8_2Arbeid + q8_3Inntekt + q8_4Parti, mydata, Hess =T)
+mJ <- polr(q4_10~ log(Sum.felt.hjortedyr) + q2_10 + q2_11.1, mydata, Hess =T) # Jegertradisjoner
+mD <- polr(q4_10~+ q2_6.5 + q2_7.5 + q2_11.1, mydata, Hess =T) # J# Damage . OBS- SPM: Hva blir riktig å inkludere for q2_6 og q2_7, se spoerreundersoekelse
+mJandD <- polr(q4_10~ log(Sum.felt.hjortedyr) + q2_10 + q2_11.1,q2_6.5 + q2_7.5 + q2_11.1, mydata, Hess =T) # Kan kanskje droppe denne som bare er en kombinasjon av to? For det dekkes uansett, eller?  
+mAtt <- polr(factor(q4_10) ~ q3_1median + q3_2median + q6_average, mydata,Hess = T) # NB need to run OversiktPaper1 q3_2median before running this
+mExp #model experience 
+mTrust <- polr(q4_10~ q4_1 + q4_2+q4_3+q4_5+q4_6+q4_7+q4_8+q4_9, mydata, Hess =T) # SPM: Basert paa faktoranalysen kan vi vel ikke slaa sammen noen av disse variablene, evt. velge ut noen (i saa fall maa vel valget baseres paa hvilkne vi har mest tro paa basert på oekologi eller lignende? 
+
+mkomb <- # 
+
+# div jeg ikke har tatt stilling til ennaa 
 #ma <- polr(q4_10~ Alder + Kjønn + BefTetthetKommune, mydata, Hess=TRUE) # Folkemengde fungerer ikke - får feilmelding på summary. 
 #mb <- polr(q4_10~ Alder + Kjønn + BefTetthetKommune + q8_1Utdanning + q8_3Inntekt + q8_4Parti, mydata, Hess=TRUE)
-mc <- polr(q4_10~ log(Folkemengde)+Alder + Kjønn + BefTetthetKommune + AntallRartZone+ Wolfzone + Antallarter + ArtTilstede, mydata, Hess=TRUE) # Inkludering av Sum.felt.hjortedyr gir warning message . In sqrt(diag(vc)) : NaNs produced
+#mc <- polr(q4_10~ log(Folkemengde)+Alder + Kjønn + BefTetthetKommune + AntallRartZone+ Wolfzone + Antallarter + ArtTilstede, mydata, Hess=TRUE) # Inkludering av Sum.felt.hjortedyr gir warning message . In sqrt(diag(vc)) : NaNs produced
 #md <- polr(q4_10~ Alder + Kjønn + q3_1b + q2_6.5 + q2_7.5 + q2_10 + BefTetthetKommune + Sum.felt.hjortedyr+ AntallRartZone+ Wolfzone + Antallarter + ArtTilstede, mydata, Hess=TRUE) # Inkludering av Sum.felt.hjortedyr gir warning message  + f�r warning message design appears to be rank-deficient, In sqrt(diag(vc)) : NaNs produced
 #me <- polr(q4_10~ Alder + Kjønn + q3_1b + q2_6.5, mydata, Hess = TRUE)  # rank-deficient. 
 #mf <- polr(q4_10~ Alder + Kjønn + q2_6.5, mydata, Hess = TRUE) 
 #mg <- polr(q4_10~ Alder + Kjønn + Folkemengde, mydata, Hess = TRUE)
 #range(mydata$Folkemengde)
 
+# Ser paa en av modellene
+summary(mSE)
+(ctable <- coef(summary(mSE)))
+p <- pnorm(abs(ctable[,"t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+ctable
+(ci <- confint(mc))
+confint.default(mc)
+# SPM: Forstaar ikke helt utskriftene her. Er ikke p-verdiene signifikante for alle men enkelte har har CI som inkluderer 0? 
+
+
 #### averaging ####
-#m1 <- polr(q4_10~ Alder + Kjønn + q3_1b + q2_6.5 + q2_7.5 + q2_10 + BefTetthetKommune + Sum.felt.hjortedyr+ AntallRartZone+ Wolfzone + Antallarter + ArtTilstede, mydata, Hess=TRUE) # Inkludering av Sum.felt.hjortedyr gir warning message  + f�r warning message design appears to be rank-deficient, In sqrt(diag(vc)) : NaNs produced
-names(mydata)
-mSE <-polr(q4_10~ Alder + Kjønn + log(Folkemengde) + BefTetthetKommune + q8_1Utdanning + q8_2Arbeid + q8_3Inntekt + q8_4Parti, mydata, Hess =T)
-mR <- polr(q4_10~ Bearzone + Wolfzone +  + BefTetthetKommune + q8_1Utdanning + q8_2Arbeid + q8_3Inntekt + q8_4Parti, mydata, Hess =T)
-mByland <- polr(q4_10~ Alder + Kjønn + log(Folkemengde) + BefTetthetKommune + q8_1Utdanning + q8_2Arbeid + q8_3Inntekt + q8_4Parti, mydata, Hess =T)
-mJ <- polr(q4_10~ Alder + , mydata, Hess =T) # Jegertradisjoner
-mD <-  # Damage , kanskje pluss jeger? 
-mkombi <- #
-mkombi2 <- # 
+
 
 #### selection ####
 
