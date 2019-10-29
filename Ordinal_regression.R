@@ -40,49 +40,32 @@ mydata$AntallRArterF <- as.factor(mydata$AntallRArterF) # Endret til hva som så
 mydata$q3_1b[mydata$q3_1b==4] <- NA  
 is.na(mydata$q3_1b)
 
-# Question: do this with all variables of interest. Maybe extracting interesting variables first? 
-# running model with more variables 
-#variable <- c("Folkemengde", "BefTetthetKommune","q2_6","q2_7","q2_10","Sum.felt.hjortedyr","SausluppetFylke","Tapt.saulam.fylke","Saulamtapprosent.F","Felt.HjortElg.K", "Bearzone","Wolfzone","Wolverinezone", "Lynxzone","AntallRartZone", "bj�rn","gaupe","jerv","ulv","Antallarter","ArtTilstede")
-# sporsmaal om en rekke variabler. 
-
 
 #### Train data ####
-#Det er et poeng for å validere modellen, men tror vi kjører all data inn i modelleringen her siden vi ikke har s� mye data i utgangspunktet. Vi m�tte is�fall ha gjort et utvalg innenfor hver kommune ja (om vi tenker at respondentene har en n�stet i kommune). 
-# Det kan i s�fall enkelt gj�res ved � kj�re funksjonen i linje 37 i en loop som indekserer p� kommune.
-# Svar: Ok, kunne gjerne trengt hjelp til å sette opp dette? Aldri satt opp loop selv før. 
-# Oppgave jeg maa gjoere: Sett opp loop
-
-##KM: HMMM, tror ikke jeg husker helt hva vi skulle sette opp loop på, er det blitt borte?
-#loop kan settes opp på flere måter, men den enkleste (og tregeste hvis det er mye data) er en for-loop. Er det mye data så pleier jeg å bruke data.table-pakka, men den tar det ofte litt lengere tid å bli dus på
-#generelt kan en for-loop for å indeksere på en faktor settes opp sånn
-for(i in levels(faktor))
-{                                          
-  Shit that needs too be done
-  
-  eks: 
-  test.data<-subset(data, subset=Value==i)
-  cr<-with(test.data,chapmanRobson(Alder_ny_slope,lnN,1:max(test.data$Alder_ny_slope)))
-  keep.Z<-cbind(keep.Z,cr$est)
-}
-keep.Z
 
 #MB: Man kan vel gjoere slik for aa hente ut to rader fra samme kommuner: 
-for(i in levels(mydata$Kommune))
-{                                          
+##KM Ja, dette er egentlig en bedre og foretrukket måte for en såpass "enkel" oppgave (da uten å ha det i en loop), men var mer for å vise hvordan man kan sette det opp i en loop også
+
+#for(i in levels(mydata$Kommune))
+#{                                          
   test.data <- mydata %>% group_by(Kommune) %>% sample_n(size = 2)
-}
+#}
 #MB: skal man ha inn en test inn i denne, slik som under? (bortsett fra at jeg ikke helt forstod hvordan dette skulle gjoeres så den er helt feil saa langt)
 #MB: men tror jeg trenger hjelp til aa forstaa hva vi oensker aa oppnaa
-for(i in levels(mydata$Kommune))
-{                                          
-  test.data <- mydata %>% group_by(Kommune) %>% sample_n(size = 2)
-  cr<-with(test.data, polr(q4_10,1:max(test.data$q4_10)))
-  keep.Z<-cbind(keep.Z,cr$est)
-}
-keep.Z
+##KM: Det man kan gjøre er å lage modellen med teningsdata, og så bruke den modellen for å predikere for den andre delen (testdata). På den måten kan man se feks hvor generell modellen er,
+##dvs hvor godt treffer den predikerte verdien for testdata i forhold til faktisk/målte verdier i testdata?
+
+#for(i in levels(mydata$Kommune))
+#{                                          
+#  test.data <- mydata %>% group_by(Kommune) %>% sample_n(size = 2)
+#  cr<-with(test.data, polr(q4_10,1:max(test.data$q4_10)))
+#  keep.Z<-cbind(keep.Z,cr$est)
+#}
+#keep.Z
 # MB: ser ogsaa at det er mange forskjellige maater aa gjoere det paa.
 # MB: .. som LOOCV og k-fold. Er det den sistnevte vi gjoer bare at vi passer paa aa alltid ha med f.eks. 3 av samme kommune i trainingsettet og 2 i test?
-
+## KM: Jepp, alltid mange måter å gjøre alt på ;-), men poenget er at man på en elelr annen måte får testet modellen sin. Om det da er et poeng at den skal være generell.
+## Om den er ment for å være en mer beskrivende modell, så bruker man bare all data man har inn i å trene opp modellen, og beskriver resultatene utifra det.
 mydata2
 test.data
 str(test.data)
@@ -99,7 +82,7 @@ hist(log(mydata$Folkemengde))
 #mydata$Sum.felt.hjortedy <- 
 hist(mydata$Sum.felt.hjortedyr)
 hist(log(mydata$Sum.felt.hjortedyr)) # er det mulig aa log-transforemre her, eller maa noe annet gjoeres?   
-  
+
 m1 <- polr(q4_10~ Alder + Kjønn +log(Folkemengde) +BefTetthetKommune + log(Sum.felt.hjortedyr) + SausluppetFylke + AntallRartZone + Wolfzone + AntallRArterF + ArtTilstede + q3_1b + q2_6.5 + q2_7.5 + q2_10 , mydata, Hess=TRUE) 
 summary(m1)
 #Du får rank-deficient modell her fordi vi putter for mange variable inn for å forklare variasjonen. 
@@ -110,7 +93,52 @@ summary(m1)
 #En anne måte er å sette opp en modell med alle variable vi tror gir mening, og bare oppgi denne. og en annen er igjen å finne den "enkleste" modellen basert på noen seleksjonsmetode.
 #Det man kan gjøre er å sette opp feks 10 kandidatmodeller, som vi har trua på med tanke på vraiable-kombinasjoner, og så sette disse opp mot hverandre og sjekke forskjeller i AIC-verdier
 #MB: Jeg tenkte foerst vi burde proeve aa selektere basert paa kandidatmodeller. Men er det ikke en del kritikk ift bruk av stepwise selection ogsaa? 
-# MB: er det noe problem aa gjoere begge varianter som du nevner?
+## KM: mener her å sette opp modeller basert på antagelser fra litteratur/eller annen vitenskap. Så ikke selektere per variabel egentlig, men sette opp hele modeller man har trua på, og så teste disse i mellom seg.
+## Har man feks kunnskap, eller en ide om at Kjønn og Alder uansett er viktig her, så er det ikke noe vits å teste ut dette på nytt
+
+# MB: er det noe problem aa gjoere begge varianter som du nevner? 
+## KM: Ikke noe problem, men du bør bare presentere en av dem
+
+
+
+#######################
+# Modellseleksjon AIC #
+#######################
+#setter opp et eksempel med bakgrunn  i variablene som er med i modellene under (og med en grunnløs (?) antagelse om at kjønn og alder har alltid noe å si)
+
+# Kunn effekt av demografi (dvs ingen effekt av variable)
+
+m0 <- polr(q4_10~ Alder + Kjønn, mydata, Hess=TRUE)
+
+### Effekt av tilsetdeværelse av rovdyrarter 
+
+m1 <- polr(q4_10~ Alder + Kjønn + ArtTilstede, mydata, Hess=TRUE)
+
+# Antagligvis så vil effekten av artilsetdeværelse variere med alder (bare ment hypotetisk)
+
+m2 <- polr(q4_10~ Alder*ArtTilstede + Kjønn , mydata, Hess=TRUE)
+
+### Sosioøkonomiske effekter
+
+m3 <- polr(q4_10~ Alder + Kjønn + ArtTilstede+q8_1Utdanning+q8_3Inntekt, mydata, Hess=TRUE)
+
+##OSV, osv
+
+# Se på forskjeller mellom modeller
+bbmle::ICtab(m0,m1,m2,m3, type="AICc", logLik = T)
+
+
+## Lager tabeller
+stargazer::stargazer(m2, m3,type="html",
+                     title="Regression Results",
+                     intercept.bottom = F,
+                     intercept.top = T,
+                     ci = F, digits=2,
+                     notes = "This is a caption.",
+                     model.names = T,
+                     single.row = T,
+                     out="C:/Users/magnusb/Filr/My Files/Oppgave/Data spørreundersøkelse/RETTredigert/Arbeidsfil Paper 1/modeller.doc")##mange flere muligheter på layout her, sjekk ?stargazer
+
 
 #### Alternative modeller ####                             
 # SPM: Boer vi gruppere dem inn i temaer? Eller boer jeg velge ut den modellen jeg har best tro paa paa tvers av "tema"? 
