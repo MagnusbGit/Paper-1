@@ -279,6 +279,14 @@ names(NEP)[names(NEP) == "median"] <- "q6_median"
 NEP2<- NEP[,9:10]
 head(NEP)
 # calculating q3_1 average
+mydata$q3_1a[mydata$q3_1a==4] <- 0  
+mydata$q3_1b[mydata$q3_1b==4] <- 0  
+mydata$q3_1c[mydata$q3_1c==4] <- 0  
+mydata$q3_1d[mydata$q3_1d==4] <- 0  
+mydata$q3_2a[mydata$q3_2a==4] <- 0
+mydata$q3_2b[mydata$q3_2b==4] <- 0
+mydata$q3_2c[mydata$q3_2c==4] <- 0
+mydata$q3_2d[mydata$q3_2d==4] <- 0
 RovviltsituasjonN<-mydata[,c("RESPID",c("q3_1a","q3_1b", "q3_1c", "q3_1d") )]
 head(RovviltsituasjonN)
 # make average and median
