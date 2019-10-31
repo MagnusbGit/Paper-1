@@ -101,6 +101,7 @@ summary(m1)
 #######################
 #setter opp et eksempel med bakgrunn  i variablene som er med i modellene under (og med en grunnløs (?) antagelse om at kjønn og alder har alltid noe å si)
 names(mydata)
+
 # Kunn effekt av demografi (dvs ingen effekt av variable)
 
 m0 <- polr(q4_10~ Alder + Kjønn, mydata, Hess=TRUE)
@@ -146,8 +147,8 @@ m7b <- polr(q4_10~ log(Sum.felt.hjortedyr) + q2_10 + q2_11.1 + q2_6.5 + q2_7.5 +
 m8 <- polr(q4_10~ Alder + Kjønn + ArtTilstede + q2_1.5 + q2_2.5 + q2_3.5 + q2_6.5 + q2_7.5 + log(Sum.felt.hjortedyr), mydata, Hess=TRUE)
 
 ### Tillit 
-m9 <- polr(q4_10~ q4_1 + q4_2+q4_3+q4_5+q4_6+q4_7+q4_8+q4_9, mydata, Hess =T) # SPM: Basert paa faktoranalysen kan vi vel ikke slaa sammen noen av disse variablene, evt. velge ut noen (i saa fall maa vel valget baseres paa hvilkne vi har mest tro paa basert på oekologi eller lignende? 
-
+m9 <- polr(q4_10~ q4_1 + q4_2+q4_3+q4_5+q4_6+q4_7+q4_8+q4_9, mydata, Hess =T) # SPM:hvis vi inkluderer alle tillitsspørsmålene saa faar vi veldig lav AICc. Men gir vel ikke mening aa gjoere saant? Basert paa faktoranalysen kan vi vel ikke slaa sammen noen av disse variablene, evt. velge ut noen (i saa fall maa vel valget baseres paa hvilkne vi har mest tro paa basert på oekologi eller lignende? 
+m9b <- polr(q4_10~ q4_1 + q4_2+q4_3+q4_5+q4_6+q4_7+q4_8+q4_9, mydata, Hess =T) # 
 ### Modell jeg har god tro paa paa tvers av temaer
 m10 <- polr(q4_10~Alder+Kjønn+ArtTilstede+q2_6.5+q3_1average+q6_average,mydata,Hess=T) # 
 #tilpasning ved å slette de man har minst tro på (ved aa jukse og se paa) - det skal man sikkert ikke gjoere, men det eneste jeg fikk ut at det var at kjoenn kan fjernes fra denne modellen
@@ -155,14 +156,20 @@ m10b <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average+q6_average,mydata,Hess=T
 m10c <- polr(q4_10~Alder+q2_6.5+q3_1average+q6_average,mydata,Hess=T)
 m10d <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average,mydata,Hess=T)
 
+m10b2 <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average+q6_average + q4_3,mydata,Hess=T) 
+m10b3 <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average+q4_3,mydata,Hess=T) 
+m10b4 <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average+q4_3+q4_8+q4_9,mydata,Hess=T) #hvis vi isteden legger til variabler vi vet korrelerer faar vi bedre modell, men gir kanskje ikke mye mening aa teste. 
+m10b5 <- polr(q4_10~Alder+q3_1average+q4_3+q4_8+q4_9,mydata,Hess=T) 
+
 ##OSV, osv
 
 # Se på forskjeller mellom modeller
 bbmle::ICtab(m0,m1,m2,m3, type="AICc", logLik = T)
-bbmle::ICtab(m0,m1,m2,m3,m10,m10b,m10c,m10d, type="AICc", logLik = T)
+bbmle::ICtab(m0,m1,m2,m3,m4,m5,m6,m7a,m7b,m8,m9,m10, type="AICc", logLik = T) # 
+bbmle::ICtab(m0,m1,m2,m3,m10,m10b,m10c,m10d,m10b2,m10b3,m10b4,m10b5, type="AICc", logLik = T) # 
 
 ## Lager tabeller
-stargazer::stargazer(m2, m10,type="html",
+stargazer::stargazer(m9, m10b2,m10b3,type="html",
                      title="Regression Results",
                      intercept.bottom = F,
                      intercept.top = T,
@@ -172,6 +179,15 @@ stargazer::stargazer(m2, m10,type="html",
                      single.row = T,
                      out="C:/Users/magnusb/Filr/My Files/Oppgave/Data spørreundersøkelse/RETTredigert/Arbeidsfil Paper 1/modeller.doc")##mange flere muligheter på layout her, sjekk ?stargazer
 
+stargazer::stargazer(m2,m10b3,m10b4,m10b5,type="html",
+                     title="Regression Results",
+                     intercept.bottom = F,
+                     intercept.top = T,
+                     ci = F, digits=2,
+                     notes = "This is a caption.",
+                     model.names = T,
+                     single.row = T,
+                     out="C:/Users/magnusb/Filr/My Files/Oppgave/Data spørreundersøkelse/RETTredigert/Arbeidsfil Paper 1/modeller.doc")##mange flere muligheter på layout her, sjekk ?stargazer
 
 
 #### Alternative modeller ####                             
