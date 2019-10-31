@@ -150,16 +150,16 @@ m9 <- polr(q4_10~ q4_1 + q4_2+q4_3+q4_5+q4_6+q4_7+q4_8+q4_9, mydata, Hess =T) # 
 
 ### Modell jeg har god tro paa paa tvers av temaer
 m10 <- polr(q4_10~Alder+Kjønn+ArtTilstede+q2_6.5+q3_1average+q6_average,mydata,Hess=T) # 
-#tilpasning ved å slette de man har minst tro på (ved aa jukse og se paa)
-m11 <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average+q6_average,mydata,Hess=T) # Kjoenn boer bort
-m12 <- polr(q4_10~Alder+q2_6.5+q3_1average+q6_average,mydata,Hess=T)
-m13 <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average,mydata,Hess=T)
+#tilpasning ved å slette de man har minst tro på (ved aa jukse og se paa) - det skal man sikkert ikke gjoere, men det eneste jeg fikk ut at det var at kjoenn kan fjernes fra denne modellen
+m10b <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average+q6_average,mydata,Hess=T) # Kjoenn boer bort
+m10c <- polr(q4_10~Alder+q2_6.5+q3_1average+q6_average,mydata,Hess=T)
+m10d <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average,mydata,Hess=T)
 
 ##OSV, osv
 
 # Se på forskjeller mellom modeller
 bbmle::ICtab(m0,m1,m2,m3, type="AICc", logLik = T)
-bbmle::ICtab(m0,m1,m2,m3,m10,m11,m12,m13, type="AICc", logLik = T)
+bbmle::ICtab(m0,m1,m2,m3,m10,m10b,m10c,m10d, type="AICc", logLik = T)
 
 ## Lager tabeller
 stargazer::stargazer(m2, m10,type="html",
