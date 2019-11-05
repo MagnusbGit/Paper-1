@@ -29,6 +29,8 @@ library(sqldf)
 library(RColorBrewer)
 library(ggthemes)
 library(stringr)
+library(expss)
+library(data.table)
 
 # Load data
 setwd("C:/Users/magnusb/Filr/My Files/Oppgave/Data spørreundersøkelse/RETTredigert/Arbeidsfil Paper 1")
@@ -519,6 +521,27 @@ ggplot(Arbeidsfil1, aes(Innbyggertallgruppe, group = q4_10)) +
   )+
   theme(axis.line = element_line(color = 'black'))
 
+##### Making tables ####
+library(expss)
+library(data.table)
+library(dplyr)
+library(formattable)
+library(tidyr)
+setalloccol
+alloc.col
+help.search("setalloccol")
+help.search("col")
+#customGreen0 = "#DeF7E9"
+#customGreen = "#71CA97"
+#customRed = "#ff7f7f"
+data(mtcars)
+cro(mtcars$am, mtcars$vs)
+mtcars$am
+q4_10C
+setalloccol() 
+cro(mydata$Kjønn, mydata$q4_10C)
+cro_cpct(mtcars$cyl, list(total(), mtcars$am, mtcars$vs))
+
 #ggplot(Arbeidsfil1, aes(Kjønn, group = q4_10)) + 
 #  geom_bar(aes(y =  (..count..)/sum(..count..), fill = factor(q4_10)), stat="count") + 
 #  scale_y_continuous(labels=scales::percent,expand = c(0, 0)) +
@@ -726,12 +749,57 @@ ggplot(Arbeidsfil1, aes(CatAlder, group = q4_10)) +
 
 
 #### O: svar ####
+##
+Ptestdataalle<- Arbeidsfil1[,c("q4_1","q4_2","q4_3","q4_4","q4_5","q4_6","q4_7","q4_8","q4_9","q4_10","q4_11")]
+str(Ptestdataalle)
+Ptestdataalle <- lapply(Ptestdataalle, factor, levels = c(1:5))
+Ptestdataalle$q4_1<-mapvalues(Ptestdataalle$q4_1, from = c("1", "2","3","4","5"), to = c("Helt uenig","Uenig","HverkenEller","Enig","Helt enig"))
+Ptestdataalle$q4_2<-mapvalues(Ptestdataalle$q4_2, from = c("1", "2","3","4","5"), to = c("Helt uenig","Uenig","HverkenEller","Enig","Helt enig"))
+Ptestdataalle$q4_3<-mapvalues(Ptestdataalle$q4_3, from = c("1", "2","3","4","5"), to = c("Helt uenig","Uenig","HverkenEller","Enig","Helt enig"))
+Ptestdataalle$q4_4<-mapvalues(Ptestdataalle$q4_4, from = c("1", "2","3","4","5"), to = c("Helt uenig","Uenig","HverkenEller","Enig","Helt enig"))
+Ptestdataalle$q4_5<-mapvalues(Ptestdataalle$q4_5, from = c("1", "2","3","4","5"), to = c("Helt uenig","Uenig","HverkenEller","Enig","Helt enig"))
+Ptestdataalle$q4_6<-mapvalues(Ptestdataalle$q4_6, from = c("1", "2","3","4","5"), to = c("Helt uenig","Uenig","HverkenEller","Enig","Helt enig"))
+Ptestdataalle$q4_7<-mapvalues(Ptestdataalle$q4_7, from = c("1", "2","3","4","5"), to = c("Helt uenig","Uenig","HverkenEller","Enig","Helt enig"))
+Ptestdataalle$q4_8<-mapvalues(Ptestdataalle$q4_8, from = c("1", "2","3","4","5"), to = c("Helt uenig","Uenig","HverkenEller","Enig","Helt enig"))
+Ptestdataalle$q4_9<-mapvalues(Ptestdataalle$q4_9, from = c("1", "2","3","4","5"), to = c("Helt uenig","Uenig","HverkenEller","Enig","Helt enig"))
+Ptestdataalle$q4_10<-mapvalues(Ptestdataalle$q4_10, from = c("1", "2","3","4","5"), to = c("Helt uenig","Uenig","HverkenEller","Enig","Helt enig"))
+Ptestdataalle$q4_11<-mapvalues(Ptestdataalle$q4_11, from = c("1", "2","3","4","5"), to = c("Helt uenig","Uenig","HverkenEller","Enig","Helt enig"))
+names(Ptestdataalle) <- c(
+  q4_1="Jeg synes at forskning generelt er viktig i dagens samfunn",
+  q4_2="Det er alvorlig om allmennheten mister troen paa forskning",
+  q4_3="Jeg har tillit til forskning generelt",
+  q4_4="Jeg har tillit til medisinsk forskning",
+  q4_5="Jeg har tillit til klimaforskning",
+  q4_6="Jeg synes forskere generelt virker aa ha hoey ekspertise",
+  q4_7="Jeg synes at forskere generelt virker aa ha hoey troverdighet",
+  q4_8="Jeg synes rovviltforskerne virker aa ha hoey ekspertise",
+  q4_9="Jeg synes rovviltforskerne virker aa ha hoey ekspertise",
+  q4_10="Jeg har tillit til rovviltforskningen i Norge",
+  q4_11="Jeg har tillit til at rovviltforskerne legger fram objektive resultater")
+str(Ptestdataalle)
+Ptestdataalle<-as.data.frame(Ptestdataalle)
+lPtestdataalle <- likert(Ptestdataalle)
+summary(lPtestdataalle, center=2)
+plot(lPtestdataalle)
+plot(lPtestdataalle, ordered=FALSE, group.order=names(Ptestdataalle)) #Specify the exact order of the y-axis
+plot(lPtestdataalle, centered=FALSE, wrap = 30) # Var det dette det var kritikk mot aa gjoere? 
+plot(lPtestdataalle, plot.percents=TRUE, plot.percent.low=FALSE, plot.percent.high=FALSE)
+plot(lPtestdataalle, colors=c('orange','darkorange','grey','darkblue','blue'))
+
+
+lPtestdataalleK <- likert(Ptestdataalle,grouping = Arbeidsfil1$Kjønn)
+summary(lPtestdataalleK,center=2)
+lPtestdataalleK <-mapvalues(lPtestdataalleK$Group, from = c("1", "2"), to = c("Mann","Kvinne"))
+plot(lPtestdataalleK, group.order=c('1', '2'))
+plot(lPtestdataalleK, centered=FALSE,group.order=c('1', '2'))
+plot(lPtestdataalleK,include.center=FALSE,group.order=c('1', '2'))
+
 
 
 # Make centered likert charts
 Ptestdata<- Arbeidsfil1[,c("q4_1","q4_2","q4_3","q4_6","q4_7")]
 Ptestdata[1:5] <- lapply(Ptestdata[1:5], factor, levels = 1:5)
-
+head(Ptestdata)
 # Create a likert object
 Ptestdata_likert<-likert(Ptestdata[1:5])
 plot(Ptestdata_likert, ordered = FALSE, group.order = names(Ptestdata[1:5]))
