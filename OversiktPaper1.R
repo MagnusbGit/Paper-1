@@ -329,7 +329,7 @@ mydata<-cbind(mydata,RovviltsituasjonN2H)
 PtestdataNEP <- NEP[,c("q6_1","q6_2","q6_3","q6_4","q6_5","q6_6","q6_7","q6_median")]
 PtestdataNEP [1:8] <- lapply(PtestdataNEP [1:8], factor, levels = 1:5)
 PtestdataNEP_likert<-likert(PtestdataNEP [1:8])
-plot(PtestdataNEP_likert, ordered = FALSE, centered = FALSE, group.order = names(PtestdataNEP [1:8])) # Synes det så litt rart ut med prosent før og etter søyla, gir pakka mulighet for å ta det inne i alle søylene?
+plot(PtestdataNEP_likert, ordered = FALSE, centered = TRUE, group.order = names(PtestdataNEP [1:8])) # Synes det så litt rart ut med prosent før og etter søyla, gir pakka mulighet for å ta det inne i alle søylene?
 
 # NEP median
 
@@ -354,6 +354,7 @@ ggplot(mydata,aes(q6_median,fill = factor(q4_10))) +
     ,axis.title.y=element_text(size=14) 
   )+
   theme(axis.line = element_line(color = 'black'))  
+
 
 # trenger ikke denne her, men kanskje en anna plass - reduser antall kategorier i q6median ved aa lage ny variabel
 str(mydata$q6_median)
@@ -539,6 +540,7 @@ cro(mtcars$am, mtcars$vs)
 mtcars$am
 q4_10C
 setalloccol() 
+# library "expss". or use expss:cro? 
 cro(mydata$Kjønn, mydata$q4_10C)
 cro_cpct(mtcars$cyl, list(total(), mtcars$am, mtcars$vs))
 
@@ -902,10 +904,13 @@ plot(both_PtestdataGenRov_likert_RT, type ="density")
 # Forskning carnivore and CatAlder
 both_PtestdataGenRov_likert_CA = likert(PtestdataGenRov[,c(1:7),drop=FALSE], grouping = PtestdataGenRov$CatAlder)
 plot(both_PtestdataGenRov_likert_CA, include.histogram = FALSE)
-plot(both_PtestdataGenRov_likert_CA, type ="density")
+plot(both_PtestdataGenRov_likert_CA, group.order = both_PtestdataGenRov_likert_CA$Group, include.histogram = FALSE)
+plot(both_PtestdataGenRov_likert_CA,  order = both_PtestdataGenRov_likert_CA$Group,type ="density")
 both_PtestdataGenRov_likert_CA = likert(PtestdataGenRov[,c(1,4:6),drop=FALSE], grouping = PtestdataGenRov$CatAlder)
 plot(both_PtestdataGenRov_likert_CA, include.histogram = FALSE)
 plot(both_PtestdataGenRov_likert_CA, type ="density")
+
+plot(lPtestdataalle, ordered=FALSE, group.order=names(Ptestdataalle)) #Specify the exact order of the y-axis
 
 
 #### Example of type of plotting ####
