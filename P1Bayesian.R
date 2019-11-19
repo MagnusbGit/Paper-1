@@ -113,7 +113,7 @@ plot(m1, plotfun = "areas") # should not be close to zero.
 #launch_shinystan(m_rst) # gives you a broad diagnistics of your model
 
 # posterior predictive check
-pp_check(m_rst, plotfun = "dens_overlay", nreps = 30) # makes 30 lines instead of the total number of samples in that is 4000. 
+pp_check(m1, plotfun = "dens_overlay", nreps = 30) # makes 30 lines instead of the total number of samples in that is 4000. 
 # you want the lines to be similar to the datasetline. Here we had a lot that missed. A lot of noise in the predictions in the model. 
 # this model could potentially be improved. We should try that. 
 # each line is one variation of the prediction of the model (all are plausible predictions from the model).
@@ -126,84 +126,69 @@ pp_check(m_rst, plotfun = "intervals")
 # try to fit quadratic model (do square on the continious variables) because we have a bell shape when plotting data
 # gam - generalized .. model 
 
-d <- 
-  d %>%
-  dplyr::mutate (phsq = ph^2)
 
-m_rst2 <- stan_glm(change_seahare_mass_g_fw ~ ph + phsq + nutrients,
-                   data = d,
-                   family = gaussian(), # likelihood
-                   iter = 2000,
-                   chains = 4
-)
+data <- 
+  data %>%
+  dplyr::mutate (Alder = Alder^2)
+str(data)
 
+postm2 <- stan_polr(trust_r_science ~ ArtTilstede + Kjønn + Alder,data=data, 
+                   prior = R2(0.25), prior_counts = dirichlet(1),
+                   seed = 12345, iter=1000, chains = 1)
 
-plot (m_rst2, plotfun="trace")
+plot (postm2, plotfun="trace")
 
-summary (m_rst2)
+summary (postm2)
 
-pp_check(m_rst2, plotfun = "dens_overlay", nreps = 30)
-pp_check(m_rst2, plotfun = "hist", nreps = 10)
-pp_check(m_rst2, plotfun = "intervals")
+pp_check(m1, plotfun = "dens_overlay", nreps = 30)
+pp_check(postm2, plotfun = "dens_overlay", nreps = 30)
+pp_check(postm2, plotfun = "hist", nreps = 10)
+pp_check(postm2, plotfun = "intervals")
 
 ?waic.stanreg # do this for each model and compare the waic value. If they are the same then model is equally bad. 
-waic(m_rst)
-waic(m_rst2)
-# just a way to check the package version
-packageVersion ("rstanarm")
-packageVersion ("loo")
+waic(m1)
+waic(postm2)
 
+
+
+#### Loo ####
 # loo - Leave One Out. Takes a lot of time. It is a cross-validation (not using a separate dataset).
 # k-cross validation - another way is to cut the dataset to use folds. k = cuts 
 #?loo
-m2<-stan_polr(trust_r_science ~ ArtTilstede + Kjønn + Alder,data=data, 
-              prior = R2(0.1), prior_counts = dirichlet(1),
-              seed = 12345, iter = 1000, chains = 1) 
-summary(m2)
 
 
-loo1 <- loo(m_rst) # 
-loo2 <- loo(m_rst2)
+
+loo1 <- loo(m1) # 
+loo2 <- loo(postm2)
 
 loo_compare(loo1,loo2) # comuting the difference between the loo values of the model. 
 
-m_rst3 <- stan_glm(change_seahare_mass_g_fw ~ ph + nutrients + ph:nutrients,
+postm3 <- (change_seahare_mass_g_fw ~ ph + nutrients + ph:nutrients,
                    data = d,
                    family = gaussian(), # likelihood
                    iter = 2000,
                    chains = 4
 )
+## other ways to improve model? 
+# interactions?
+# interactions with log-variable?
+# qadratic?
 
-loo3 <- loo(m_rst3)
-loo_compare(loo1, loo2,loo3)
-
-m_rst4 <- stan_glm(change_seahare_mass_g_fw ~ ph + phsq+ nutrients + ph:nutrients + phsq:nutrients,
-                   data = d,
-                   family = gaussian(), # likelihood
-                   iter = 2000,
-                   chains = 4
-)
-
-loo4 <- loo(m_rst4)
-loo_compare(loo1,loo2,loo3,loo4)
-
-#m_rst5 <- stan_glm(log(change_seahare_mass_g_fw) ~ ph + phsq+ nutrients + ph:nutrients + phsq:nutrients,
-#                   data = d,
-#                   family = gaussian(), # likelihood
-#                   iter = 2000,
-#                   chains = 4
-#)
-#loo5 <- loo(m_rst5)
-#loo_compare(loo1,loo2,loo3,loo4,loo5)
+# fit the potential models and compare loos as above? 
+#example: loo_compare(loo1,loo2,loo3,loo4,loo5)
 
 library(sjPlot)
-plot_model(m_rst)
-plot_model(m_rst, type = "pred", terms = "ph")
-plot_model(m_rst, type = "pred", terms = "nutrients")
-plot_model(m_rst3, type = "pred", terms = "ph")
-plot_model(m_rst3, type = "pred", terms = "nutrients")
-plot_model(m_rst4, type = "int")
+plot_model(m1)
+plot_model(postm2)
+# plot_model(m_rst, type = "pred", terms = "nutrients") # possible with continous variables
 
+
+
+## Fit more models when we have fixed for problems above ##
+#m2<-stan_polr(trust_r_science ~ ArtTilstede + Kjønn + Alder,data=data, 
+#              prior = R2(0.1), prior_counts = dirichlet(1),
+#              seed = 12345, iter = 1000, chains = 1) 
+#summary(m2)
 
 
 #### brms? Fit model ####
