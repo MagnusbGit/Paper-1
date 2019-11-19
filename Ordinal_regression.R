@@ -12,7 +12,7 @@ library(Hmisc)
 library(reshape2)
 library(tidyverse)
 library(lattice)
-library(Rtools)
+#library(Rtools)
 library(bbmle)
 
 #str(mydata)
@@ -161,12 +161,21 @@ m10b3 <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average+q4_3,mydata,Hess=T)
 m10b4 <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average+q4_3+q4_8+q4_9,mydata,Hess=T) #hvis vi isteden legger til variabler vi vet korrelerer faar vi bedre modell, men gir kanskje ikke mye mening aa teste. 
 m10b5 <- polr(q4_10~Alder+q3_1average+q4_3+q4_8+q4_9,mydata,Hess=T) 
 
+m11 <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average + q4_3,mydata,Hess=T)
+m11 <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average,mydata,Hess=T)
+m11 <- polr(q4_10~Alder+ArtTilstede+q2_6.5 + q4_3,mydata,Hess=T)
+m11 <- polr(q4_10~Alder+ArtTilstede+q3_1average + q4_3,mydata,Hess=T)
+
 ##OSV, osv
+# try to reduce this particular model, but only get higher dAICC:
+
 
 # Se på forskjeller mellom modeller
 bbmle::ICtab(m0,m1,m2,m3, type="AICc", logLik = T)
 bbmle::ICtab(m0,m1,m2,m3,m4,m5,m6,m7a,m7b,m8,m9,m10, type="AICc", logLik = T) # 
-bbmle::ICtab(m0,m1,m2,m3,m10,m10b,m10c,m10d,m10b2,m10b3,m10b4,m10b5, type="AICc", logLik = T) # 
+bbmle::ICtab(m0,m1,m2,m3,m10,m10b,m10c,m10d,m10b2,m10b3,m10b4,m10b5,m9,m11, type="AICc", logLik = T) # 
+
+# m9 og m10b5 scorer veldig "bra", men er ikke gode modeller! 
 
 ## Lager tabeller
 stargazer::stargazer(m9, m10b2,m10b3,type="html",

@@ -254,7 +254,7 @@ ggplot(Arbeidsfil1, aes(factor(q4_3), group = ArtTilstede)) +
 ####  NEP and q3_1 calc #### 
 #  NEP - reverse values and calculate mean. Median to? 
 # If you want...
-mydata <-read.csv("~/DIV NINA/DatasetSpørreundersøkelseOkt2019.csv",header=T,sep=";",dec = "," ,na.strings = "")
+#mydata <-read.csv("~/DIV NINA/DatasetSpørreundersøkelseOkt2019.csv",header=T,sep=";",dec = "," ,na.strings = "")
 mydata <- read.csv(file="DatasetSpørreundersøkelseOkt2019.csv",header=T,sep=";")
 
 NEP<-mydata[,c("RESPID","q6_1","q6_2","q6_3","q6_4","q6_5","q6_6","q6_7")]
