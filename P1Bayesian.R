@@ -163,16 +163,12 @@ loo2 <- loo(postm2)
 
 loo_compare(loo1,loo2) # comuting the difference between the loo values of the model. 
 
-postm3 <- (change_seahare_mass_g_fw ~ ph + nutrients + ph:nutrients,
-                   data = d,
-                   family = gaussian(), # likelihood
-                   iter = 2000,
-                   chains = 4
-)
+
 ## other ways to improve model? 
 # interactions?
 # interactions with log-variable?
 # qadratic?
+# what about a (1|Kommune), is that needed?
 
 # fit the potential models and compare loos as above? 
 #example: loo_compare(loo1,loo2,loo3,loo4,loo5)
