@@ -268,3 +268,4 @@ drop1(mc2, type=F)
 ## Nei, ikke helt stuerent, men se kommentar over. Sett opp 10-15 modeller som gir mening, og gjerne en 0modell uten variable, og test mellom disse
 
 
+
