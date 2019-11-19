@@ -6,23 +6,31 @@ library(tidyverse)
 library(rstanarm)
 library(dplyr)
 library(MASS)
+
 head(data)
-
+names(data)
 # m10 <- polr(q4_10~Alder+Kjønn+ArtTilstede+q2_6.5+q3_1average+q6_average,mydata,Hess=T) # including one model from glm for testing
-
+data$q2_6.5
+data$exdamage
 data <- 
   data %>% 
   dplyr::rename(trust_r_science = q4_10) %>% 
-  dplyr::select(RESPID, Alder, ArtTilstede, q2_6.5,trust_r_science,Kjønn) %>%
+  dplyr::rename(education = q8_1Utdanning) %>%
+  dplyr::rename(exdamage = q2_6.5) %>%
+  dplyr::select(RESPID, Alder, ArtTilstede, exdamage,trust_r_science,Kjønn,education) %>%
   dplyr::mutate(ArtTilstede = as.factor(ArtTilstede)) %>%
   dplyr::mutate(trust_r_science = as.factor (trust_r_science))
 data$trust_r_science<-factor(data$trust_r_science, levels=c("1", "2", "3","4","5"), ordered=TRUE)
 data$Kjønn[data$Kjønn==1] = "Male" 
 data$Kjønn[data$Kjønn==2] = "Female" 
 data$Kjønn = factor(data$Kjønn,ordered=FALSE)
-data$q2_6.5<-data$q2_6.5[data$q2_6.5==0] <- "Damage"
-data$q2_6.5<-data$q2_6.5[data$q2_6.5==1] <- "Not damage"
-data$q2_6.5 = factor(data$q2_6.5,ordered=FALSE)
+data$education[data$education==5] = "4" 
+data$education <- mapvalues(data$education, from =c("1", "2","3","4"), to = c("Grunnskole","videregaaende","bachelor","masterdoc"))  
+data$education = factor(data$education,ordered=FALSE)
+data$Kjønn = factor(data$Kjønn,ordered=FALSE)
+data$exdamage[data$exdamage==0] = "Damage"
+data$exdamage[data$exdamage==1] = "Not damage"
+data$exdamage = factor(data$exdamage,ordered=FALSE)
 
 str(data)
 head(data)
@@ -58,7 +66,21 @@ tab_ArtTilstede <- data %>%
   group_by(ArtTilstede) %>%dplyr::summarize(Freq = n()) %>%mutate(Prop = Freq/sum(Freq)) %>%arrange(desc(Prop))
 tab_ArtTilstede
 
+# experienced damage
+unique(data$exdamage)
+ggplot(data, aes(exdamage)) + 
+  geom_bar(aes(y = (..count..)/sum(..count..))) + 
+  scale_y_continuous(labels=scales::percent) +
+  ylab("Prosent")+
+  scale_x_discrete(limits = c("Not damage","Damage"))  # is this one possible to use? it is very skewed! 
 
+# utdanning
+unique(data$education)
+ggplot(data, aes(education)) + 
+  geom_bar(aes(y = (..count..)/sum(..count..))) + 
+  scale_y_continuous(labels=scales::percent) +
+  ylab("Prosent")+
+  scale_x_discrete(limits = c("Grunnskole","videregaaende","bachelor","masterdoc")) 
 
 #### Fit model - Rstanarm #### 
 # Example from glm:
@@ -180,11 +202,22 @@ plot_model(postm2)
 
 
 
+## ANOTHER MODEL
+#m5e <- polr(q4_10~Alder+ArtTilstede+q2_6.5 +Kjønn+ q8_1Utdanning,mydata,Hess=T)
+m2 <- stan_polr(trust_r_science ~ ArtTilstede + exdamage + Kjønn + Alder + education,data=data, 
+                   prior = R2(0.1), prior_counts = dirichlet(1),
+                   seed = 12345, iter = 1000, chains = 1)
 ## Fit more models when we have fixed for problems above ##
 #m2<-stan_polr(trust_r_science ~ ArtTilstede + Kjønn + Alder,data=data, 
 #              prior = R2(0.1), prior_counts = dirichlet(1),
 #              seed = 12345, iter = 1000, chains = 1) 
-#summary(m2)
+posterior_vs_prior(m2)
+plot(m2, plotfun = "trace") # Should not be able to distinguish chains, they should be centered on parameter estimates in the posterior - looks OK
+summary(m1) # Rhat are 1.0 = OK. n_eff are high = OK
+plot(m2, plotfun = "intervals") # to show the whole distribution. 
+plot(m2, plotfun = "dens_overlay") # the acutal posterior densisty for each chain for each parameter - can report this
+plot(m2, plotfun = "areas") # should not be close to zero. 
+pp_check(m2, plotfun = "dens_overlay", nreps = 30)
 
 
 #### brms? Fit model ####
