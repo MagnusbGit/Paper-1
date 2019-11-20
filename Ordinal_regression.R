@@ -81,24 +81,10 @@ hist(log(mydata$Folkemengde))
 hist(mydata$Sum.felt.hjortedyr)
 hist(log(mydata$Sum.felt.hjortedyr)) # er det mulig aa log-transforemre her, eller maa noe annet gjoeres?   
 
-m1 <- polr(q4_10~ Alder + Kjønn +log(Folkemengde) +BefTetthetKommune + log(Sum.felt.hjortedyr) + SausluppetFylke + AntallRartZone + Wolfzone + AntallRArterF + ArtTilstede + q3_1b + q2_6.5 + q2_7.5 + q2_10 , mydata, Hess=TRUE) 
-summary(m1)
-#Du får rank-deficient modell her fordi vi putter for mange variable inn for å forklare variasjonen. 
 
-## Svar: Det er litt forskjellige tilnærminger til å redusere variabler, en måte er å sette opp alle mulige modeller for så å gjøre en model_average basert på disse
-#så slutt-modellen er altså en sammensettning av alle modellene, men vekte basert på AIC-verdier, og hva disse modellene inneholder. 
-#En anne måte er å sette opp en modell med alle variable vi tror gir mening, og bare oppgi denne. og en annen er igjen å finne den "enkleste" modellen basert på noen seleksjonsmetode.
-#Det man kan gjøre er å sette opp feks 10 kandidatmodeller, som vi har trua på med tanke på vraiable-kombinasjoner, og så sette disse opp mot hverandre og sjekke forskjeller i AIC-verdier
-#MB: Jeg tenkte foerst vi burde proeve aa selektere basert paa kandidatmodeller. Men er det ikke en del kritikk ift bruk av stepwise selection ogsaa? 
-## KM: mener her å sette opp modeller basert på antagelser fra litteratur/eller annen vitenskap. Så ikke selektere per variabel egentlig, men sette opp hele modeller man har trua på, og så teste disse i mellom seg.
-## Har man feks kunnskap, eller en ide om at Kjønn og Alder uansett er viktig her, så er det ikke noe vits å teste ut dette på nytt
-# kan gjøre begge varianter, men bare presenter en av dem. 
-
-
-
-#######################
-# Modellseleksjon AIC #
-#######################
+### ### ### ### ### ### ### ###
+#### Modellseleksjon AIC #####
+### ### ### ### ### ### ### ###
 #setter opp et eksempel med bakgrunn  i variablene som er med i modellene under (og med en grunnløs (?) antagelse om at kjønn og alder har alltid noe å si)
 names(mydata)
 
@@ -107,88 +93,106 @@ names(mydata)
 m0 <- polr(q4_10~ Alder + Kjønn, mydata, Hess=TRUE)
 
 ### Effekt av tilsetdeværelse av rovdyrarter 
-
+# ArtTilstede
 m1 <- polr(q4_10~ Alder + Kjønn + ArtTilstede, mydata, Hess=TRUE)
- 
 m1a <- polr(q4_10~ Alder + Kjønn + ArtTilstede, mydata, Hess=TRUE)
 m1b <- polr(q4_10~ Alder + Kjønn + q3_1average, mydata, Hess=TRUE)
 m1c <- polr(q4_10~ Alder + Kjønn + q3_2average, mydata, Hess=TRUE)
+
 # Effekt av tilsetdeværelse av rovdyrzone
 m1d <- polr(q4_10~ Alder + Kjønn + ArtTilstede + RzoneTilstede, mydata, Hess=TRUE)
 m1e <- polr(q4_10~ Alder + Kjønn+ ArtTilstede + Wolfzone, mydata, Hess=TRUE)
 
+# Rovdyrsone og Tildestedeværelse
+m1f <- polr(q4_10~ Alder + Kjønn + ArtTilstede + Wolfzone, mydata, Hess=TRUE)
+bbmle::ICtab(m1,m1a,m1b,m1c,m1d,m1e,m1f, type="AICc", logLik = T)
+
+# Rovdyr tilstede sammen med andre faktorer
+m5 <- polr(q4_10~ Alder + Kjønn + ArtTilstede+q8_1Utdanning+q8_3Inntekt, mydata, Hess=TRUE)
+m5a <- polr(q4_10~ Alder + ArtTilstede+q8_1Utdanning+q8_3Inntekt, mydata, Hess=TRUE)
+m5b <- polr(q4_10~Alder+ArtTilstede+q2_6.5,mydata,Hess=T)
+m5c <- polr(q4_10~Alder+ArtTilstede+q2_6.5 + q8_3Inntekt,mydata,Hess=T)
+m5d <- polr(q4_10~Alder+ArtTilstede+q2_6.5 + q8_1Utdanning,mydata,Hess=T)
+m5e <- polr(q4_10~Alder+ArtTilstede+q2_6.5 +Kjønn+ q8_1Utdanning,mydata,Hess=T)
+bbmle::ICtab(m5,m5a,m5b,m5c,m5d,m5e, type="AICc", logLik = T)
+
+
 # Antagligvis så vil effekten av artilsetdeværelse variere med alder (bare ment hypotetisk)
-
 m2 <- polr(q4_10~ Alder*ArtTilstede + Kjønn , mydata, Hess=TRUE)
-m2b <- polr(q4_10~ Alder*q3_1average + kjønn, mydata, Hess=TRUE)
-### Sosioøkonomiske effekter
+m2b <- polr(q4_10~ Alder*q3_1average + Kjønn, mydata, Hess=TRUE)
 
+
+### Sosioøkonomiske effekter
 m3 <- polr(q4_10~ Alder + Kjønn + ArtTilstede+q8_1Utdanning+q8_3Inntekt, mydata, Hess=TRUE)
+
 
 ### Sosioøkonomiske og demografi
 m4 <- polr(q4_10~ Alder + Kjønn + log(Folkemengde) + BefTetthetKommune + q8_1Utdanning + q8_4Parti, mydata, Hess =T)
 
-### Rovdyr tilstede
-
-m5 <- polr(q4_10~ Alder + Kjønn + ArtTilstede+q8_1Utdanning+q8_3Inntekt, mydata, Hess=TRUE)
 
 ### Attitude rovdyr
+m6 <- polr(q4_10~ Alder + Kjønn + q3_1average + q8_1Utdanning, mydata, Hess=TRUE)
+m6b <- polr(q4_10~ Alder + Kjønn + q3_1average*ArtTilstede + q8_1Utdanning, mydata, Hess=TRUE)
 
-m6 <- polr(q4_10~ Alder + Kjønn + ArtTilstede + q8_1Utdanning+q8_3Inntekt, mydata, Hess=TRUE)
 
-### Jakttradisjoner 
-
+### Jakttradisjoner - mange forskjellige varianter er mulig. 
+m7 <- polr(q4_10~ Alder + Kjønn + ArtTilstede + q2_10 + q2_11.1 + q2_11.3 , mydata, Hess=TRUE)
 m7a <- polr(q4_10~ Alder + Kjønn + ArtTilstede + q2_10 + q2_11.1 + q2_11.3 , mydata, Hess=TRUE)
+m7b <- polr(q4_10~ Alder + Kjønn + log(Sum.felt.hjortedyr) + ArtTilstede + q2_10 + q2_11.1 + q2_6.5 + q2_7.5, mydata, Hess =T) # Kan kanskje droppe denne som bare er en kombinasjon av to? For det dekkes uansett, eller?  
+m7c <- polr(q4_10~ Alder + Kjønn + log(Sum.felt.hjortedyr) + ArtTilstede + q2_10 + q2_11.1 + q2_6.5, mydata, Hess =T) # Kan kanskje droppe denne som bare er en kombinasjon av to? For det dekkes uansett, eller?  
+m7d <- polr(q4_10~ Alder + Kjønn + log(Sum.felt.hjortedyr) + ArtTilstede + q2_10 + q2_6.5, mydata, Hess =T) # Kan kanskje droppe denne som bare er en kombinasjon av to? For det dekkes uansett, eller?  
+m7e <- polr(q4_10~ Alder + log(Sum.felt.hjortedyr) + q2_10 + q2_11.1 + q2_6.5 + q2_7.5, mydata, Hess =T) # Kan kanskje droppe denne som bare er en kombinasjon av to? For det dekkes uansett, eller?  
+m7f <- polr(q4_10~ Alder + log(Sum.felt.hjortedyr) + q2_11.1 + q2_6.5 + q2_7.5, mydata, Hess =T) # Kan kanskje droppe denne som bare er en kombinasjon av to? For det dekkes uansett, eller?  
+m7g <- polr(q4_10~ Alder + q2_11.1 + q2_6.5 + q2_7.5, mydata, Hess =T)
 
-m7b <- polr(q4_10~ log(Sum.felt.hjortedyr) + q2_10 + q2_11.1 + q2_6.5 + q2_7.5 + q2_11.1, mydata, Hess =T) # Kan kanskje droppe denne som bare er en kombinasjon av to? For det dekkes uansett, eller?  
+bbmle::ICtab(m7,m7a,m7b,m7c,m7d,m7e,m7f,m7g, type="AICc", logLik = T)
+
 
 ### attitude and experience damage + hunting
-
 m8 <- polr(q4_10~ Alder + Kjønn + ArtTilstede + q2_1.5 + q2_2.5 + q2_3.5 + q2_6.5 + q2_7.5 + log(Sum.felt.hjortedyr), mydata, Hess=TRUE)
+m8a <- polr(q4_10~ Alder + ArtTilstede + q2_1.5 + q2_2.5 + q2_3.5 + q2_6.5 + q2_7.5, mydata, Hess=TRUE)
+bbmle::ICtab(m8,m8a, type="AICc", logLik = T)
 
 ### Tillit 
 m9 <- polr(q4_10~ q4_1 + q4_2+q4_3+q4_5+q4_6+q4_7+q4_8+q4_9, mydata, Hess =T) # SPM:hvis vi inkluderer alle tillitsspørsmålene saa faar vi veldig lav AICc. Men gir vel ikke mening aa gjoere saant? Basert paa faktoranalysen kan vi vel ikke slaa sammen noen av disse variablene, evt. velge ut noen (i saa fall maa vel valget baseres paa hvilkne vi har mest tro paa basert på oekologi eller lignende? 
-m9b <- polr(q4_10~ q4_1 + q4_2+q4_3+q4_5+q4_6+q4_7+q4_8+q4_9, mydata, Hess =T) # 
+m9b <- polr(q4_10~ q4_1 + q4_2 + q4_3 + q4_5 + q4_6,mydata, Hess =T) # 
+m9c <- polr(q4_10~ q4_1 + q4_2 + q4_3, mydata, Hess =T)
+bbmle::ICtab(m9,m9b,m9c, type="AICc", logLik = T)
+summary(m9)
+(ctablem9 <- coef(summary(m9)))
+pm9 <- pnorm(abs(ctablem9[,"t value"]), lower.tail = FALSE) * 2
+(ctablem9 <- cbind(ctablem9, "p value" = p))
+ctablem9
+
+m7og9 <- polr(q4_10~ Alder + q2_11.1 + q2_6.5 + q2_7.5 + q4_1, mydata, Hess =T) # hvis vi inkluderer en av de andre tillitsvariablene så vil det forbedre modellen. For disse er korrelert. Blir det derfor feil å inkludere denne f.eks.? 
+
+
 ### Modell jeg har god tro paa paa tvers av temaer
 m10 <- polr(q4_10~Alder+Kjønn+ArtTilstede+q2_6.5+q3_1average+q6_average,mydata,Hess=T) # 
 #tilpasning ved å slette de man har minst tro på (ved aa jukse og se paa) - det skal man sikkert ikke gjoere, men det eneste jeg fikk ut at det var at kjoenn kan fjernes fra denne modellen
-m10b <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average+q6_average,mydata,Hess=T) # Kjoenn boer bort
-m10c <- polr(q4_10~Alder+q2_6.5+q3_1average+q6_average,mydata,Hess=T)
-m10d <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average,mydata,Hess=T)
+m10a <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average+q6_average + q4_3,mydata,Hess=T) 
+m10b <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average+q4_3,mydata,Hess=T) 
+m10c <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average+q4_3+q4_8+q4_9,mydata,Hess=T) #hvis vi isteden legger til variabler vi vet korrelerer faar vi bedre modell, men gir kanskje ikke mye mening aa teste. 
+m10d <- polr(q4_10~Alder+q3_1average+q4_3+q4_8+q4_9,mydata,Hess=T) 
+m10e <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average + q4_3,mydata,Hess=T)
+bbmle::ICtab(m10,m10a,m10b,m10c,m10d,m10e, type="AICc", logLik = T) # 
 
-m10b2 <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average+q6_average + q4_3,mydata,Hess=T) 
-m10b3 <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average+q4_3,mydata,Hess=T) 
-m10b4 <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average+q4_3+q4_8+q4_9,mydata,Hess=T) #hvis vi isteden legger til variabler vi vet korrelerer faar vi bedre modell, men gir kanskje ikke mye mening aa teste. 
-m10b5 <- polr(q4_10~Alder+q3_1average+q4_3+q4_8+q4_9,mydata,Hess=T) 
-
-m11 <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average + q4_3,mydata,Hess=T)
-m11 <- polr(q4_10~Alder+ArtTilstede+q2_6.5+q3_1average,mydata,Hess=T)
-m11 <- polr(q4_10~Alder+ArtTilstede+q2_6.5 + q4_3,mydata,Hess=T)
-m11 <- polr(q4_10~Alder+ArtTilstede+q3_1average + q4_3,mydata,Hess=T)
-
-##OSV, osv
-# try to reduce this particular model, but only get higher dAICC:
+### Sammenlign alle modeller ###
+bbmle::ICtab(m0,m1b,m2b,m3,m4,m5e,m6b,m7g,m8a,m9,m10d, type="AICc", logLik = T) # 
+# Evaluering av resultater: 
+# 1. m10d er en dårlig modell. Dropp
+# 2. m11d, kan jeg bruke q3_1 slik? Ka jeg vruke q2_6.5 slik? Se paa spoersmaalet. Her bruker jeg "ingen av delene". Maa denne gjoeres om? 
+# 3. m10b er dårlig modell. Dropp
+# 4. m7g
+# 5. m6b
 
 
-# Se på forskjeller mellom modeller
-bbmle::ICtab(m0,m1,m2,m3, type="AICc", logLik = T)
-bbmle::ICtab(m0,m1,m2,m3,m4,m5,m6,m7a,m7b,m8,m9,m10, type="AICc", logLik = T) # 
-bbmle::ICtab(m0,m1,m2,m3,m10,m10b,m10c,m10d,m10b2,m10b3,m10b4,m10b5,m9,m11, type="AICc", logLik = T) # 
+# m9 og m10d scorer veldig "bra", men er ikke gode modeller! 
 
-# m9 og m10b5 scorer veldig "bra", men er ikke gode modeller! 
+
 
 ## Lager tabeller
-stargazer::stargazer(m9, m10b2,m10b3,type="html",
-                     title="Regression Results",
-                     intercept.bottom = F,
-                     intercept.top = T,
-                     ci = F, digits=2,
-                     notes = "This is a caption.",
-                     model.names = T,
-                     single.row = T,
-                     out="C:/Users/magnusb/Filr/My Files/Oppgave/Data spørreundersøkelse/RETTredigert/Arbeidsfil Paper 1/modeller.doc")##mange flere muligheter på layout her, sjekk ?stargazer
-
-stargazer::stargazer(m2,m10b3,m10b4,m10b5,type="html",
+stargazer::stargazer(m11, m7g,type="html",
                      title="Regression Results",
                      intercept.bottom = F,
                      intercept.top = T,
@@ -199,29 +203,6 @@ stargazer::stargazer(m2,m10b3,m10b4,m10b5,type="html",
                      out="C:/Users/magnusb/Filr/My Files/Oppgave/Data spørreundersøkelse/RETTredigert/Arbeidsfil Paper 1/modeller.doc")##mange flere muligheter på layout her, sjekk ?stargazer
 
 
-#### Alternative modeller ####                             
-# SPM: Boer vi gruppere dem inn i temaer? Eller boer jeg velge ut den modellen jeg har best tro paa paa tvers av "tema"? 
-#m1 <- polr(q4_10~ Alder + Kjønn + q3_1b + q2_6.5 + q2_7.5 + q2_10 + BefTetthetKommune + Sum.felt.hjortedyr+ AntallRartZone+ Wolfzone + Antallarter + ArtTilstede, mydata, Hess=TRUE) # Inkludering av Sum.felt.hjortedyr gir warning message  + f�r warning message design appears to be rank-deficient, In sqrt(diag(vc)) : NaNs produced
-# hva skjer om jeg gjoer q4
-#mSE <-polr(q4_10~ Alder + Kjønn + log(Folkemengde) + BefTetthetKommune + q8_1Utdanning + q8_2Arbeid + q8_3Inntekt + q8_4Parti, mydata, Hess =T)
-#mR <- polr(q4_10~ Bearzone + Wolfzone + Lynxzone + Wolverinezone + AntallRartZone +RzoneTilstede+bjørn+gaupe+jerv+ulv+Antallarter+ArtTilstede, mydata, Hess =T) # DROPP VARIABLER
-#mByland <- polr(q4_10~ Alder + Kjønn + log(Folkemengde) + BefTetthetKommune + q8_1Utdanning + q8_2Arbeid + q8_3Inntekt + q8_4Parti, mydata, Hess =T)
-#mJ <- polr(q4_10~ log(Sum.felt.hjortedyr) + q2_10 + q2_11.1, mydata, Hess =T) # Jegertradisjoner
-#mD <- polr(q4_10~+ q2_6.5 + q2_7.5 + q2_11.1, mydata, Hess =T) # J# Damage . OBS- SPM: Hva blir riktig å inkludere for q2_6 og q2_7, se spoerreundersoekelse
-#mJandD <- polr(q4_10~ log(Sum.felt.hjortedyr) + q2_10 + q2_11.1,q2_6.5 + q2_7.5 + q2_11.1, mydata, Hess =T) # Kan kanskje droppe denne som bare er en kombinasjon av to? For det dekkes uansett, eller?  
-#mAtt <- polr(factor(q4_10) ~ q3_1median + q3_2median + q6_average, mydata,Hess = T) # NB need to run OversiktPaper1 q3_2median before running this
-#mExp #model experience 
-#mTrust <- polr(q4_10~ q4_1 + q4_2+q4_3+q4_5+q4_6+q4_7+q4_8+q4_9, mydata, Hess =T) # SPM: Basert paa faktoranalysen kan vi vel ikke slaa sammen noen av disse variablene, evt. velge ut noen (i saa fall maa vel valget baseres paa hvilkne vi har mest tro paa basert på oekologi eller lignende? 
-
-# div jeg ikke har tatt stilling til ennaa 
-#ma <- polr(q4_10~ Alder + Kjønn + BefTetthetKommune, mydata, Hess=TRUE) # Folkemengde fungerer ikke - får feilmelding på summary. 
-#mb <- polr(q4_10~ Alder + Kjønn + BefTetthetKommune + q8_1Utdanning + q8_3Inntekt + q8_4Parti, mydata, Hess=TRUE)
-#mc <- polr(q4_10~ log(Folkemengde)+Alder + Kjønn + BefTetthetKommune + AntallRartZone+ Wolfzone + Antallarter + ArtTilstede, mydata, Hess=TRUE) # Inkludering av Sum.felt.hjortedyr gir warning message . In sqrt(diag(vc)) : NaNs produced
-#md <- polr(q4_10~ Alder + Kjønn + q3_1b + q2_6.5 + q2_7.5 + q2_10 + BefTetthetKommune + Sum.felt.hjortedyr+ AntallRartZone+ Wolfzone + Antallarter + ArtTilstede, mydata, Hess=TRUE) # Inkludering av Sum.felt.hjortedyr gir warning message  + f�r warning message design appears to be rank-deficient, In sqrt(diag(vc)) : NaNs produced
-#me <- polr(q4_10~ Alder + Kjønn + q3_1b + q2_6.5, mydata, Hess = TRUE)  # rank-deficient. 
-#mf <- polr(q4_10~ Alder + Kjønn + q2_6.5, mydata, Hess = TRUE) 
-#mg <- polr(q4_10~ Alder + Kjønn + Folkemengde, mydata, Hess = TRUE)
-#range(mydata$Folkemengde)
 
 # Ser paa en av modellene
 summary(mSE)
@@ -245,7 +226,7 @@ confint.default(mc)
 
  
 
-#### EKSTRA UNDER - ikke byr oss enda ####
+#### EKSTRA UNDER - ikke bryr oss enda ####
 
 # bruker mc videre for å sette opp prosessen bare. 
 #summary(ma)
@@ -278,3 +259,36 @@ drop1(mc2, type=F)
 
 
 
+#### Ekstra - Kommentarer ####
+
+## Svar: Det er litt forskjellige tilnærminger til å redusere variabler, en måte er å sette opp alle mulige modeller for så å gjøre en model_average basert på disse
+#så slutt-modellen er altså en sammensettning av alle modellene, men vekte basert på AIC-verdier, og hva disse modellene inneholder. 
+#En anne måte er å sette opp en modell med alle variable vi tror gir mening, og bare oppgi denne. og en annen er igjen å finne den "enkleste" modellen basert på noen seleksjonsmetode.
+#Det man kan gjøre er å sette opp feks 10 kandidatmodeller, som vi har trua på med tanke på vraiable-kombinasjoner, og så sette disse opp mot hverandre og sjekke forskjeller i AIC-verdier
+#MB: Jeg tenkte foerst vi burde proeve aa selektere basert paa kandidatmodeller. Men er det ikke en del kritikk ift bruk av stepwise selection ogsaa? 
+## KM: mener her å sette opp modeller basert på antagelser fra litteratur/eller annen vitenskap. Så ikke selektere per variabel egentlig, men sette opp hele modeller man har trua på, og så teste disse i mellom seg.
+## Har man feks kunnskap, eller en ide om at Kjønn og Alder uansett er viktig her, så er det ikke noe vits å teste ut dette på nytt
+# kan gjøre begge varianter, men bare presenter en av dem. 
+
+# SPM: Boer vi gruppere dem inn i temaer? Eller boer jeg velge ut den modellen jeg har best tro paa paa tvers av "tema"? 
+#m1 <- polr(q4_10~ Alder + Kjønn + q3_1b + q2_6.5 + q2_7.5 + q2_10 + BefTetthetKommune + Sum.felt.hjortedyr+ AntallRartZone+ Wolfzone + Antallarter + ArtTilstede, mydata, Hess=TRUE) # Inkludering av Sum.felt.hjortedyr gir warning message  + f�r warning message design appears to be rank-deficient, In sqrt(diag(vc)) : NaNs produced
+# hva skjer om jeg gjoer q4
+#mSE <-polr(q4_10~ Alder + Kjønn + log(Folkemengde) + BefTetthetKommune + q8_1Utdanning + q8_2Arbeid + q8_3Inntekt + q8_4Parti, mydata, Hess =T)
+#mR <- polr(q4_10~ Bearzone + Wolfzone + Lynxzone + Wolverinezone + AntallRartZone +RzoneTilstede+bjørn+gaupe+jerv+ulv+Antallarter+ArtTilstede, mydata, Hess =T) # DROPP VARIABLER
+#mByland <- polr(q4_10~ Alder + Kjønn + log(Folkemengde) + BefTetthetKommune + q8_1Utdanning + q8_2Arbeid + q8_3Inntekt + q8_4Parti, mydata, Hess =T)
+#mJ <- polr(q4_10~ log(Sum.felt.hjortedyr) + q2_10 + q2_11.1, mydata, Hess =T) # Jegertradisjoner
+#mD <- polr(q4_10~+ q2_6.5 + q2_7.5 + q2_11.1, mydata, Hess =T) # J# Damage . OBS- SPM: Hva blir riktig å inkludere for q2_6 og q2_7, se spoerreundersoekelse
+#mJandD <- polr(q4_10~ log(Sum.felt.hjortedyr) + q2_10 + q2_11.1,q2_6.5 + q2_7.5 + q2_11.1, mydata, Hess =T) # Kan kanskje droppe denne som bare er en kombinasjon av to? For det dekkes uansett, eller?  
+#mAtt <- polr(factor(q4_10) ~ q3_1median + q3_2median + q6_average, mydata,Hess = T) # NB need to run OversiktPaper1 q3_2median before running this
+#mExp #model experience 
+#mTrust <- polr(q4_10~ q4_1 + q4_2+q4_3+q4_5+q4_6+q4_7+q4_8+q4_9, mydata, Hess =T) # SPM: Basert paa faktoranalysen kan vi vel ikke slaa sammen noen av disse variablene, evt. velge ut noen (i saa fall maa vel valget baseres paa hvilkne vi har mest tro paa basert på oekologi eller lignende? 
+
+# div jeg ikke har tatt stilling til ennaa 
+#ma <- polr(q4_10~ Alder + Kjønn + BefTetthetKommune, mydata, Hess=TRUE) # Folkemengde fungerer ikke - får feilmelding på summary. 
+#mb <- polr(q4_10~ Alder + Kjønn + BefTetthetKommune + q8_1Utdanning + q8_3Inntekt + q8_4Parti, mydata, Hess=TRUE)
+#mc <- polr(q4_10~ log(Folkemengde)+Alder + Kjønn + BefTetthetKommune + AntallRartZone+ Wolfzone + Antallarter + ArtTilstede, mydata, Hess=TRUE) # Inkludering av Sum.felt.hjortedyr gir warning message . In sqrt(diag(vc)) : NaNs produced
+#md <- polr(q4_10~ Alder + Kjønn + q3_1b + q2_6.5 + q2_7.5 + q2_10 + BefTetthetKommune + Sum.felt.hjortedyr+ AntallRartZone+ Wolfzone + Antallarter + ArtTilstede, mydata, Hess=TRUE) # Inkludering av Sum.felt.hjortedyr gir warning message  + f�r warning message design appears to be rank-deficient, In sqrt(diag(vc)) : NaNs produced
+#me <- polr(q4_10~ Alder + Kjønn + q3_1b + q2_6.5, mydata, Hess = TRUE)  # rank-deficient. 
+#mf <- polr(q4_10~ Alder + Kjønn + q2_6.5, mydata, Hess = TRUE) 
+#mg <- polr(q4_10~ Alder + Kjønn + Folkemengde, mydata, Hess = TRUE)
+#range(mydata$Folkemengde)
