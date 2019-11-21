@@ -98,6 +98,7 @@ m1 <- polr(q4_10~ Alder + Kjønn + ArtTilstede, mydata, Hess=TRUE)
 m1a <- polr(q4_10~ Alder + Kjønn + ArtTilstede, mydata, Hess=TRUE)
 m1b <- polr(q4_10~ Alder + Kjønn + q3_1average, mydata, Hess=TRUE)
 m1c <- polr(q4_10~ Alder + Kjønn + q3_2average, mydata, Hess=TRUE)
+m1b2 <- polr(q4_10~ Alder + q3_1average, mydata, Hess=TRUE)
 
 # Effekt av tilsetdeværelse av rovdyrzone
 m1d <- polr(q4_10~ Alder + Kjønn + ArtTilstede + RzoneTilstede, mydata, Hess=TRUE)
@@ -105,7 +106,7 @@ m1e <- polr(q4_10~ Alder + Kjønn+ ArtTilstede + Wolfzone, mydata, Hess=TRUE)
 
 # Rovdyrsone og Tildestedeværelse
 m1f <- polr(q4_10~ Alder + Kjønn + ArtTilstede + Wolfzone, mydata, Hess=TRUE)
-bbmle::ICtab(m1,m1a,m1b,m1c,m1d,m1e,m1f, type="AICc", logLik = T)
+bbmle::ICtab(m1,m1a,m1b,m1c,m1d,m1e,m1f,m1b2, type="AICc", logLik = T)
 
 # Rovdyr tilstede sammen med andre faktorer
 m5 <- polr(q4_10~ Alder + Kjønn + ArtTilstede+q8_1Utdanning+q8_3Inntekt, mydata, Hess=TRUE)
@@ -185,12 +186,20 @@ bbmle::ICtab(m0,m1b,m2b,m3,m4,m5e,m6b,m7g,m8a,m9,m10d, type="AICc", logLik = T) 
 # 3. m10b er dårlig modell. Dropp
 # 4. m7g
 # 5. m6b
-
+# derfor er kanskje denne oversikten over modeller fra hvert tema den mest interessante (fjerna "uegna" modeller)
+bbmle::ICtab(m0,m1b,m2b,m3,m4,m5e,m6b,m7g,m1b2, type="AICc", logLik = T)
 
 # m9 og m10d scorer veldig "bra", men er ikke gode modeller! 
 
 
-
+m11
+#(ctable <- coef(summary(m11)))
+#p <- pnorm(abs(ctable[,"t value"]), lower.tail = FALSE) * 2
+#(ctable <- cbind(ctable, "p value" = p))
+#ctable
+#(ci <- confint(m11))
+#confint.default(m11)
+m7g
 ## Lager tabeller
 stargazer::stargazer(m11, m7g,type="html",
                      title="Regression Results",
