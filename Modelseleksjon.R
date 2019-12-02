@@ -89,9 +89,12 @@ bbmle::ICtab(m5b,m6a,m6b, type="AICc", logLik = T)
 m7a <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_3_5 + q8_1Utdanning + q2_11.1 + q2_7.5, mydata, Hess =T)
 m7b <- polr(q4_10~ q4_3 + q4_2 + q4_7 + ArtTilstede + q3_3_5 + q2_11.1 + q2_7.5, mydata, Hess =T)
 m7c <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_3_5 + q2_11.1 + q2_7.5, mydata, Hess =T)
+m7d <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_3_5 + q2_7.5, mydata, Hess =T)
 names(mydata)
-bbmle::ICtab(m6b,m7a,m7b,m7c, type="AICc", logLik = T) 
-# QUESTION: m7c er innenfor 2 dAICc-verdier. Vil det si at vi kan bruke m7c som best model?
+bbmle::ICtab(m6b,m7a,m7b,m7c,m7d, type="AICc", logLik = T) 
+# QUESTION: m7d er innenfor 2 dAICc-verdier. Vil det si at vi kan bruke m7c som best model?
 # QUESTION: Eller kan man ikke begynne å fjerne variabler igjen? Må jeg da evt. gå tilbake å ta de bort tidligere i prosessen? (men blir ikke det også rart?!)
-
 # QUESTION: Vi kunne ha testet for effekten av q2_9 også (frykt), men i så fall får vi kanskje samme problem som med q3_1average?
+# QUESTION: Det er nå flere variabler jeg har tatt ut som er "tett på" å være med i den beste modellen, slik som "q8_1Utdanning", "q2_11.1", "Alder", "ArtTilstede" 
+# og dette er variabler jeg er sterkt interessert i, som det er viktig å diskutere. Hvordan forholder man seg til disse? for de er vel signifikante men akkurat ikke med i den beste modellen,
+# men så nærme at de bedre men innenfor 2 AIC (gjelder ikke alle disse)
