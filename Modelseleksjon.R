@@ -81,4 +81,10 @@ m6b <- polr(q4_10~ q4_3 + q4_2 + q4_7 + ArtTilstede + q3_3_8 + q8_1Utdanning + A
 bbmle::ICtab(m5b,m6a,m6b, type="AICc", logLik = T) 
 # QUESTION: modellen blir bedre, men kan vi inkludere q2_7.5?
 
-
+# Kan vi fjerne noe? 
+m7a <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_3_8 + q8_1Utdanning + Alder + + q2_11.1 + q2_7.5, mydata, Hess =T)
+m7b <- polr(q4_10~ q4_3 + q4_2 + q4_7 + ArtTilstede + q3_3_8 + Alder + + q2_11.1 + q2_7.5, mydata, Hess =T)
+m7c <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_3_8 + Alder + + q2_11.1 + q2_7.5, mydata, Hess =T)
+bbmle::ICtab(m6b,m7a,m7b,m7c, type="AICc", logLik = T) 
+# QUESTION: m7c er innenfor 2 dAICc-verdier. Vil det si at vi kan bruke m7c som best model?
+# QUESTION: Eller kan man ikke begynne å fjerne variabler igjen? Må jeg da evt. gå tilbake å ta de bort tidligere i prosessen? (men blir ikke det også rart?!)
