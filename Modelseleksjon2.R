@@ -1,7 +1,3 @@
-X<-mydata[,c("q4_1", "q4_2","q4_3","q4_4","q4_5","q4_6","q4_7","q4_8","q4_9")]
-library(GGally)
-ggpairs(X)
-
 # Gjør til faktor
 mydata$q4_1 <- as.factor(mydata$q4_1)
 mydata$q4_2 <- as.factor(mydata$q4_2)
@@ -44,6 +40,8 @@ bbmle::ICtab(m1e,m1f,m1g, type="AICc", logLik = T)
 
 #### B: Test #### 
 ### rovdyr tilstedeværelse
+##KMB: Så dette skal være en annen modell enn resultatet av den over? Eller er det tenkt for å se om det er holdninger eller rovdyr som har noe å si?
+
 #"RzoneTilstede"
 #"ArtTilstede" 
 mydata$qArtTilstede <- as.factor(mydata$ArtTilstede)
@@ -52,6 +50,13 @@ m2 <- polr(q4_10~ 1, mydata, Hess = T)
 m2a <- polr(q4_10~  ArtTilstede, mydata, Hess =T) # bedre
 m2b <- polr(q4_10~ RzoneTilstede, mydata, Hess =T)
 bbmle::ICtab(m2,m2a,m2b, type="AICc", logLik = T) 
+
+## KMB: Disse to alternativene ser i prinsippet helt like ut i modellen, og dette er fordi de i prinsippet måler det samme (veldig lite uavhengig):
+
+chi2 = chisq.test(mydata$qArtTilstede,mydata$RzoneTilstede, correct=F)
+c(chi2$statistic, chi2$p.value)
+
+#så her ville jeg bare valgt en av de, uten å nødvendigvis teste hvem som er best.
 
 ## Sos Demografi
 mydata$Kjønn <- as.factor(mydata$Kjønn)
@@ -63,19 +68,20 @@ bbmle::ICtab(m2a,m4a,m4b,m4c, type="AICc", logLik = T)
 m4d <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder, mydata, Hess =T)
 m4e <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Kjønn, mydata, Hess =T)
 m4f <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn, mydata, Hess =T) # Bedre
-# QUESTION: Skal vi ta velge m4f her? Det er vel riktig siden den er best og 2.5 bedre enn enklere modell. 
+# QUESTION: Skal vi ta velge m4f her? Det er vel riktig siden den er best og 2.5 bedre enn enklere modell. ## Ja
 bbmle::ICtab(m4c,m4d,m4e,m4f, type="AICc", logLik = T)
 m4g <- polr(q4_10~ q8_1Utdanning + Alder + Kjønn, mydata, Hess =T)
 bbmle::ICtab(m4f,m4g,type="AICc", logLik = T)
 # QUESTION: Her er m3c bare 1.6 "dårligere" enn m4a. og har én df mindre. Da tar velger vi å beholde m3c, ikke sant? 
+## M3c?
 #m4d <- polr(q4_10~ q4_3 + q4_2 + q4_7 + ArtTilstede + q3_3_5 + q8_1Utdanning + Alder, mydata, Hess =T) # Bedre
- 
+
 
 
 ### Jakttradisjoner  
-m5a <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_10, mydata, Hess =T)
-m5b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1, mydata, Hess =T) # Bedre
-bbmle::ICtab(m4d,m5a,m5b, type="AICc", logLik = T) 
+m5a <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + factor(q2_10), mydata, Hess =T) #mulig de alerede er definert som faktor, men så ikke det i farten
+m5b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + factor(q2_11.1), mydata, Hess =T) # Bedre
+bbmle::ICtab(m4f,m5a,m5b, type="AICc", logLik = T) 
 # QUESTION: modellen blir bedre, men kan vi inkludere q2_11.1 som den er?
 
 
@@ -98,14 +104,22 @@ mydata$Saulamtapprosent.F <- as.numeric(mydata$Saulamtapprosent.F)
 hist(mydata$Saulamtapprosent.F)
 hist(log(mydata$Saulamtapprosent.F))
 
-m6a <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + SausluppetFylke , mydata, Hess =T)
-m6b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + Sautetthet, mydata, Hess =T) 
-m6c <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + Tapt.saulam.fylke, mydata, Hess =T) 
-m6d <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + Saulamtapprosent.F, mydata, Hess =T) 
+m6a <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + factor(q2_11.1) + SausluppetFylke , mydata, Hess =T)
+m6b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + factor(q2_11.1) + Sautetthet, mydata, Hess =T) 
+m6c <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + factor(q2_11.1) + Tapt.saulam.fylke, mydata, Hess =T) 
+m6d <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + factor(q2_11.1) + Saulamtapprosent.F, mydata, Hess =T) 
 
 bbmle::ICtab(m5b,m6a,m6b,m6c,m6d, type="AICc", logLik = T) 
 # QUESTION: Kan vi bruke variablene som over? Dårlig fordeling og muligens rart å gjøre dem numeriske når det bare er 14 forskjellige numre. 
 # må eventuelt prøve å finne data per kommune/beitelag? 
+## KMB: Ser i utgangspunktet ok ut ja
+
+
+## 
+m8<-polr(q4_10~ q4_3 + q4_2 + q4_7+ArtTilstede + q8_1Utdanning + Alder + Kjønn + factor(q2_10),mydata, Hess =T)
+
+bbmle::ICtab(m1g,m5a,m8, type="AICc", logLik = T) 
+
 
 
 ### Kan vi fjerne noe? 
