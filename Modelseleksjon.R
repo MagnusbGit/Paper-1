@@ -14,7 +14,7 @@ mydata$q4_8 <- as.factor(mydata$q4_8) # ikke med
 mydata$q4_9 <- as.factor(mydata$q4_9) # ikke med 
 mydata$q4_10 <- as.factor(mydata$q4_10) 
 
-
+#### A: Test "Synsing" 
 ### Test tillit forskning - forklare tillit til rovviltforskning relatert til tillt forskere og forskning
 # Forklaring på variablene
 # 1= forskning er viktig
@@ -36,7 +36,7 @@ m9f <- polr(q4_10~ q4_3 + q4_2 + q4_6, mydata, Hess =T)
 m9g <- polr(q4_10~ q4_3 + q4_2 + q4_7, mydata, Hess =T) # Bedre
 bbmle::ICtab(m9e,m9f,m9g, type="AICc", logLik = T) 
 
-
+#### B: Test #### 
 ### rovdyr tilstedeværelse
 #"RzoneTilstede"
 #"ArtTilstede" 
