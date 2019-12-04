@@ -50,6 +50,8 @@ bbmle::ICtab(m9e,m2a,m2b, type="AICc", logLik = T)
 ### Holdninger
 # Holdning: (mydata$q3_1average) - TODO Kom tilbake til denne - DEN MÅ FIKSES OM DEN SKAL BRUKES
 # m3 <- polr(q4_10~ q4_3 + q4_2 + q4_7 + ArtTilstede +mydata$q3_1average , mydata, Hess =T) # sjekk denne
+##KMB: Kom på at du jo egentlig bare kan summere her, isteden for å ta average, så gjør det ikke noe å sette "vet ikke" til 0?
+
 Z<-mydata[,c("q3_3_3", "q3_3_4","q3_3_5","q3_3_6","q3_3_7","q3_3_8","q3_3_9")]
 ggpairs(Z)
 mydata$q3_3_3 <- as.factor(mydata$q3_3_3)
@@ -78,6 +80,9 @@ m4b <- polr(q4_10~ q4_3 + q4_2 + q4_7 + ArtTilstede + q3_3_5 + Kjønn, mydata, H
 m4c <- polr(q4_10~ q4_3 + q4_2 + q4_7 + ArtTilstede + q3_3_5 + q8_1Utdanning, mydata, Hess =T) 
 bbmle::ICtab(m3c,m4a,m4b,m4c, type="AICc", logLik = T) 
 # QUESTION: Her er m3c bare 1.6 "dårligere" enn m4a. og har én df mindre. Da tar velger vi å beholde m3c, ikke sant? 
+##KMB: Nja, den ene df ekstra har jo med at man har lagt til en variabel i den ene modellen. I praksis så vil det si at disse modellene er så og si like basert på AIC, og det betyr også at variablen du la til nødvendigvis ikke ga så mye mer informasjon
+# og heller ikke gjorde modellen unødvendig kompleks med tanke på info variablen ga. I teorien så er dette to modeller som da med fordel kan gjøres en model-averaging på. Om vi skal begynne med det her er en annen sak. Jeg ville nok valgt som deg, gå videre med den enkleste modellen, da alder ikke fremstår som en tydelig viktig komponent. 
+
 #m4d <- polr(q4_10~ q4_3 + q4_2 + q4_7 + ArtTilstede + q3_3_5 + q8_1Utdanning + Alder, mydata, Hess =T) # Bedre
 #bbmle::ICtab(m4c,m4d, type="AICc", logLik = T) 
 
