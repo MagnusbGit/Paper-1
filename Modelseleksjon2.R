@@ -1,3 +1,21 @@
+#### LOADING DATA ####
+setwd("C:/Users/magnusb/Filr/My Files/Oppgave/Data spørreundersøkelse/RETTredigert/Arbeidsfil Paper 1")
+#mydata <-read.csv("~/DIV NINA/DatasetSpørreundersøkelseOkt2019.csv",header=T,sep=";",dec = "," ,na.strings = "")
+mydata <- read.csv(file="DatasetSpørreundersøkelseOkt2019.csv",header=T,sep=";")
+
+
+#### PACKAGES #### 
+library(ggplot2)
+library(foreign)
+library(MASS)
+library(Hmisc)
+library(reshape2)
+library(tidyverse)
+library(lattice)
+library(bbmle)
+
+
+#### FACTORS ++ ####
 X<-mydata[,c("q4_1", "q4_2","q4_3","q4_4","q4_5","q4_6","q4_7","q4_8","q4_9")]
 library(GGally)
 ggpairs(X)
@@ -13,11 +31,12 @@ mydata$q4_7 <- as.factor(mydata$q4_7)
 mydata$q4_8 <- as.factor(mydata$q4_8) # ikke med
 mydata$q4_9 <- as.factor(mydata$q4_9) # ikke med 
 mydata$q4_10 <- as.factor(mydata$q4_10) 
+
 # Regn ut q3_sum
-mydata$q3_1a[mydata$q3_1a==4] <- 0  
+mydata$q3_1a[mydata$q3_1a==4] <- 0
 mydata$q3_1b[mydata$q3_1b==4] <- 0
-mydata$q3_1c[mydata$q3_1c==4] <- 0  
-mydata$q3_1d[mydata$q3_1d==4] <- 0  
+mydata$q3_1c[mydata$q3_1c==4] <- 0
+mydata$q3_1d[mydata$q3_1d==4] <- 0
 mydata$q3_2a[mydata$q3_2a==4] <- 0
 mydata$q3_2b[mydata$q3_2b==4] <- 0
 mydata$q3_2c[mydata$q3_2c==4] <- 0
@@ -25,6 +44,10 @@ mydata$q3_2d[mydata$q3_2d==4] <- 0
 RovviltsituasjonN<-mydata[,c("RESPID",c("q3_1a","q3_1b", "q3_1c", "q3_1d") )]
 mydata$q3_1sums <- rowSums(RovviltsituasjonN[2:5], na.rm=FALSE)
 head(mydata)
+
+
+
+
 
 #### A: Test "Synsing" ####
 ### Test tillit forskning - forklare tillit til rovviltforskning relatert til tillt forskere og forskning
@@ -52,6 +75,7 @@ bbmle::ICtab(m1e,m1f,m1g, type="AICc", logLik = T)
 # Holdning: (mydata$q3_1average) - TODO Kom tilbake til denne - DEN MÅ FIKSES OM DEN SKAL BRUKES
 m1gHoldning <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_1sums, mydata, Hess =T)
 bbmle::ICtab(m1g,m1gHoldning, type="AICc", logLik = T) 
+
 
 
 #### B: Test #### 
