@@ -1,7 +1,7 @@
 #### LOADING DATA ####
 setwd("C:/Users/magnusb/Filr/My Files/Oppgave/Data spørreundersøkelse/RETTredigert/Arbeidsfil Paper 1")
 #mydata <-read.csv("~/DIV NINA/DatasetSpørreundersøkelseOkt2019.csv",header=T,sep=";",dec = "," ,na.strings = "")
-mydata <- read.csv(file="DatasetSpørreundersøkelseOkt2019.csv",header=T,sep=";")
+mydata <- read.csv(file="DatasetSpørreundersøkelseOkt2019b.csv",header=T,sep=";")
 
 
 #### PACKAGES #### 
@@ -47,8 +47,6 @@ head(mydata)
 
 
 
-
-
 #### A: Test "Synsing" ####
 ### Test tillit forskning - forklare tillit til rovviltforskning relatert til tillt forskere og forskning
 # Forklaring på variablene
@@ -75,7 +73,8 @@ bbmle::ICtab(m1e,m1f,m1g, type="AICc", logLik = T)
 # Holdning: (mydata$q3_1average) - TODO Kom tilbake til denne - DEN MÅ FIKSES OM DEN SKAL BRUKES
 m1gHoldning <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_1sums, mydata, Hess =T)
 bbmle::ICtab(m1g,m1gHoldning, type="AICc", logLik = T) 
-
+# Endelig best model: 
+# m1gHoldning <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_1sums, mydata, Hess =T)
 
 
 #### B: Test #### 
@@ -117,24 +116,20 @@ bbmle::ICtab(m4d,m5a,m5b, type="AICc", logLik = T)
 
 ### Beitedyr
 names(mydata)
+str(mydata$Sauperkm2)
 
-mydata$SausluppetFylke <- as.numeric(mydata$SausluppetFylke)
-hist(mydata$SausluppetFylke)
-hist(log(mydata$SausluppetFylke))
+hist(mydata$Sauperkm2)
+hist(log(mydata$Sauperkm2))
+mydata$Sauperkm2Log <- log(mydata$Sauperkm2) 
 
-mydata$Sautetthet <- as.numeric(mydata$Sautetthet)
-hist(mydata$Sautetthet)
-hist(log(mydata$Sautetthet))
+hist(mydata$SauLamGeit)
+hist(log(mydata$SauLamGeit))
 
-mydata$Tapt.saulam.fylke <- as.numeric(mydata$Tapt.saulam.fylke)
-hist(mydata$Tapt.saulam.fylke)
-hist(log(mydata$Tapt.saulam.fylke))
+hist(mydata$TapSauLamGeit)
+hist(log(mydata$TapSauLamGeit))
 
-mydata$Saulamtapprosent.F <- as.numeric(mydata$Saulamtapprosent.F)
-hist(mydata$Saulamtapprosent.F)
-hist(log(mydata$Saulamtapprosent.F))
 
-m6a <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + SausluppetFylke , mydata, Hess =T)
+m6a <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + Sauperkm2Log, mydata, Hess =T)
 m6b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + Sautetthet, mydata, Hess =T) 
 m6c <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + Tapt.saulam.fylke, mydata, Hess =T) 
 m6d <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + Saulamtapprosent.F, mydata, Hess =T) 
