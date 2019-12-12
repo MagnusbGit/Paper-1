@@ -115,37 +115,43 @@ bbmle::ICtab(m4d,m5a,m5b, type="AICc", logLik = T)
 
 ### Beitedyr
 names(mydata)
-str(mydata$Sauperkm2)
-
-hist(mydata$Sauperkm2)
-hist(log(mydata$Sauperkm2))
-mydata$Sauperkm2Log <- log(mydata$Sauperkm2) 
 
 hist(mydata$SauLamGeit)
 hist(log(mydata$SauLamGeit))
-mydata$SauLamGeit <- log(mydata$SauLamGeit)
+mydata$SauLamGeitLog <- log(mydata$SauLamGeit+1)
 
 hist(mydata$TapSauLamGeit)
 hist(log(mydata$TapSauLamGeit))
-mydata$TapSauLamGeit <- log(mydata$TapSauLamGeit)
+mydata$TapSauLamGeitLog <- log(mydata$TapSauLamGeit+1)
 
+m6a <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + SauLamGeitLog, mydata, Hess =T) 
+m6b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + TapSauLamGeitLog, mydata, Hess =T) 
+bbmle::ICtab(m5b,m6a,m6b, type="AICc", logLik = T) 
+# Beslutning: Behold m5b. 
 
-m6a <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + Sauperkm2Log, mydata, Hess =T)
-m6b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + Sautetthet, mydata, Hess =T) 
-m6c <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + Tapt.saulam.fylke, mydata, Hess =T) 
-m6d <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + Saulamtapprosent.F, mydata, Hess =T) 
+#### Interaksjoner? ####
+# ArtTilstede ~ Alder
+plot(ArtTilstede~Alder, data=mydata)
+plot(Alder~ArtTilstede, data=mydata)
 
-bbmle::ICtab(m5b,m6a,m6b,m6c,m6d, type="AICc", logLik = T) 
-# Question: Se egen mail - får feilmelding 
+# ArtTilstede ~ Kjønn
+plot(ArtTilstede~Kjønn, data=mydata)
 
+# test for interaksjon ArtTilstede ~ Alder og  ArtTilstede ~ Kjønn
+m7a <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + ArtTilstede*Alder , mydata, Hess =T)
+m7b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + ArtTilstede*Kjønn, mydata, Hess =T) # Bedre
+bbmle::ICtab(m5b,m7a,m7b, type="AICc", logLik = T) 
 
-### Kan vi fjerne noe? 
-m7a <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_3_5 + q8_1Utdanning + q2_11.1 + q2_7.5, mydata, Hess =T)
-m7b <- polr(q4_10~ q4_3 + q4_2 + q4_7 + ArtTilstede + q3_3_5 + q2_11.1 + q2_7.5, mydata, Hess =T)
-m7c <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_3_5 + q2_11.1 + q2_7.5, mydata, Hess =T) # Bedre
-m7d <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_3_5 + q2_7.5, mydata, Hess =T)
-names(mydata)
-bbmle::ICtab(m6b,m7a,m7b,m7c,m7d, type="AICc", logLik = T) 
+# ArtTilstede ~ Alder
+plot(Kjønn~Alder, data=mydata)
+plot(Alder~ArtTilstede, data=mydata)
 
+#### A og B ####
+m1gHoldning <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_1sums, mydata, Hess =T)
+m5b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11, mydata, Hess =T)
+
+#### Konklusjon så langt ####
+# Beste model: 
+# m5b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11, mydata, Hess =T)
 
 # - Til vurdering: Vi kunne ha testet for effekten av q2_9 også (frykt). Kan gjøre dette ved å summere, slik som vi gjorde for q3_1?
