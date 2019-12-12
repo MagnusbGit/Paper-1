@@ -69,8 +69,8 @@ m1f <- polr(q4_10~ q4_3 + q4_2 + q4_6, mydata, Hess =T)
 m1g <- polr(q4_10~ q4_3 + q4_2 + q4_7, mydata, Hess =T) # Bedre
 bbmle::ICtab(m1e,m1f,m1g, type="AICc", logLik = T) 
 # best model: m1g <- polr(q4_10~ q4_3 + q4_2 + q4_7, mydata, Hess =T)
+
 ## Holdninger
-# Holdning: (mydata$q3_1average) - TODO Kom tilbake til denne - DEN MÅ FIKSES OM DEN SKAL BRUKES
 m1gHoldning <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_1sums, mydata, Hess =T)
 bbmle::ICtab(m1g,m1gHoldning, type="AICc", logLik = T) 
 # Endelig best model: 
@@ -87,6 +87,8 @@ m2 <- polr(q4_10~ 1, mydata, Hess = T)
 m2a <- polr(q4_10~  ArtTilstede, mydata, Hess =T) # bedre
 m2b <- polr(q4_10~ RzoneTilstede, mydata, Hess =T)
 bbmle::ICtab(m2,m2a,m2b, type="AICc", logLik = T) 
+# Beslutning: Tar med både m2a og ikke m2b siden de er veldig like. Enig?  
+
 
 ## Sos Demografi
 mydata$Kjønn <- as.factor(mydata$Kjønn)
@@ -98,12 +100,8 @@ bbmle::ICtab(m2a,m4a,m4b,m4c, type="AICc", logLik = T)
 m4d <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder, mydata, Hess =T)
 m4e <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Kjønn, mydata, Hess =T)
 m4f <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn, mydata, Hess =T) # Bedre
-# QUESTION: Skal vi ta velge m4f her? Det er vel riktig siden den er best og 2.5 bedre enn enklere modell. 
 bbmle::ICtab(m4c,m4d,m4e,m4f, type="AICc", logLik = T)
-m4g <- polr(q4_10~ q8_1Utdanning + Alder + Kjønn, mydata, Hess =T)
-bbmle::ICtab(m4f,m4g,type="AICc", logLik = T)
-# QUESTION: Her er m3c bare 1.6 "dårligere" enn m4a. og har én df mindre. Da tar velger vi å beholde m3c, ikke sant? 
-#m4d <- polr(q4_10~ q4_3 + q4_2 + q4_7 + ArtTilstede + q3_3_5 + q8_1Utdanning + Alder, mydata, Hess =T) # Bedre
+#m4f <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn, mydata, Hess =T) # Best av disse
  
 
 
@@ -111,6 +109,7 @@ bbmle::ICtab(m4f,m4g,type="AICc", logLik = T)
 m5a <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_10, mydata, Hess =T)
 m5b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1, mydata, Hess =T) # Bedre
 bbmle::ICtab(m4d,m5a,m5b, type="AICc", logLik = T) 
+#m5b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11, mydata, Hess =T) # Best av disse
 # QUESTION: modellen blir bedre, men kan vi inkludere q2_11.1 som den er?
 
 
@@ -124,9 +123,11 @@ mydata$Sauperkm2Log <- log(mydata$Sauperkm2)
 
 hist(mydata$SauLamGeit)
 hist(log(mydata$SauLamGeit))
+mydata$SauLamGeit <- log(mydata$SauLamGeit)
 
 hist(mydata$TapSauLamGeit)
 hist(log(mydata$TapSauLamGeit))
+mydata$TapSauLamGeit <- log(mydata$TapSauLamGeit)
 
 
 m6a <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + Sauperkm2Log, mydata, Hess =T)
@@ -135,8 +136,7 @@ m6c <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + Tapt
 m6d <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + Saulamtapprosent.F, mydata, Hess =T) 
 
 bbmle::ICtab(m5b,m6a,m6b,m6c,m6d, type="AICc", logLik = T) 
-# QUESTION: Kan vi bruke variablene som over? Dårlig fordeling og muligens rart å gjøre dem numeriske når det bare er 14 forskjellige numre. 
-# må eventuelt prøve å finne data per kommune/beitelag? 
+# Question: Se egen mail - får feilmelding 
 
 
 ### Kan vi fjerne noe? 
@@ -146,12 +146,6 @@ m7c <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_3_5 + q2_11.1 + q2_7.5, mydata, Hess 
 m7d <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_3_5 + q2_7.5, mydata, Hess =T)
 names(mydata)
 bbmle::ICtab(m6b,m7a,m7b,m7c,m7d, type="AICc", logLik = T) 
-# QUESTION: Jeg regner med at jeg må gjoere alle variabler som skal vaere faktor til faktorvariabel manuelt? I saa fall, kan du se raskt over om jeg har gjort dette, og riktig, for alle som benyttes? 
-# QUESTION: Eller kan man ikke begynne å fjerne variabler igjen? Må jeg da evt. gå tilbake å ta de bort tidligere i prosessen? (men blir ikke det også rart?!)
-# for om jeg har gjort riktig, så skal q8_1Utdanning være med i modellen da den enklere modellen uten denne er 2.1 AIC dårligere. Men så, om man sjekker modellene nederst i proseessen så
-# er modellen uten q8_1Utdanning bedre (innenfor 2 AIC)
-# QUESTION: Det er nå flere variabler jeg har tatt ut som er "tett på" å være med i den beste modellen, slik som "q8_1Utdanning", "q2_11.1", "Alder", "ArtTilstede" 
-# og dette er variabler jeg er sterkt interessert i, som det er viktig å diskutere. Hvordan forholder man seg til disse? for de er vel signifikante men akkurat ikke med i den beste modellen,
-# men så nærme at de bedre men innenfor 2 AIC (gjelder ikke alle disse)
+
 
 # - Til vurdering: Vi kunne ha testet for effekten av q2_9 også (frykt). Kan gjøre dette ved å summere, slik som vi gjorde for q3_1?
