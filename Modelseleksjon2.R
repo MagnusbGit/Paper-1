@@ -48,7 +48,8 @@ head(mydata)
 
 
 #### A: Test "Synsing" ####
-### Test tillit forskning - forklare tillit til rovviltforskning relatert til tillt forskere og forskning
+
+### i) Test tillit forskning - forklare tillit til rovviltforskning relatert til tillt forskere og forskning
 # Forklaring på variablene
 # 1= forskning er viktig
 # 2=alvorlig mister tro på forskning
@@ -70,15 +71,17 @@ m1g <- polr(q4_10~ q4_3 + q4_2 + q4_7, mydata, Hess =T) # Bedre
 bbmle::ICtab(m1e,m1f,m1g, type="AICc", logLik = T) 
 # best model: m1g <- polr(q4_10~ q4_3 + q4_2 + q4_7, mydata, Hess =T)
 
-## Holdninger
+### ii) Holdninger
 m1gHoldning <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_1sums, mydata, Hess =T)
 bbmle::ICtab(m1g,m1gHoldning, type="AICc", logLik = T) 
 # Endelig best model: 
 # m1gHoldning <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_1sums, mydata, Hess =T)
 
 
+
 #### B: Test #### 
-### rovdyr tilstedeværelse
+
+### i) rovdyr tilstedeværelse
 #"RzoneTilstede"
 #"ArtTilstede" 
 mydata$qArtTilstede <- as.factor(mydata$ArtTilstede)
@@ -90,7 +93,7 @@ bbmle::ICtab(m2,m2a,m2b, type="AICc", logLik = T)
 # Beslutning: Tar med både m2a og ikke m2b siden de er veldig like. Enig?  
 
 
-## Sos Demografi
+### ii) Sos Demografi
 mydata$Kjønn <- as.factor(mydata$Kjønn)
 mydata$q8_1Utdanning <- as.factor(mydata$q8_1Utdanning)
 m4a <- polr(q4_10~ ArtTilstede + Alder, mydata, Hess =T) 
@@ -104,8 +107,8 @@ bbmle::ICtab(m4c,m4d,m4e,m4f, type="AICc", logLik = T)
 #m4f <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn, mydata, Hess =T) # Best av disse
  
 
-
-### Jakttradisjoner  
+### iii) Jakttradisjoner  
+mydata$q2_11.1 <- as.factor(mydata$q2_11.1)
 m5a <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_10, mydata, Hess =T)
 m5b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1, mydata, Hess =T) # Bedre
 bbmle::ICtab(m4d,m5a,m5b, type="AICc", logLik = T) 
@@ -113,7 +116,7 @@ bbmle::ICtab(m4d,m5a,m5b, type="AICc", logLik = T)
 # QUESTION: modellen blir bedre, men kan vi inkludere q2_11.1 som den er?
 
 
-### Beitedyr
+### iv) Beitedyr
 names(mydata)
 
 hist(mydata$SauLamGeit)
@@ -129,6 +132,10 @@ m6b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + TapS
 bbmle::ICtab(m5b,m6a,m6b, type="AICc", logLik = T) 
 # Beslutning: Behold m5b. 
 
+
+
+
+
 #### Interaksjoner? ####
 # ArtTilstede ~ Alder
 plot(ArtTilstede~Alder, data=mydata)
@@ -138,20 +145,48 @@ plot(Alder~ArtTilstede, data=mydata)
 plot(ArtTilstede~Kjønn, data=mydata)
 
 # test for interaksjon ArtTilstede ~ Alder og  ArtTilstede ~ Kjønn
-m7a <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + ArtTilstede*Alder , mydata, Hess =T)
-m7b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + ArtTilstede*Kjønn, mydata, Hess =T) # Bedre
+m7a <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + ArtTilstede:Alder, mydata, Hess =T)
+m7b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + ArtTilstede:Kjønn, mydata, Hess =T)
 bbmle::ICtab(m5b,m7a,m7b, type="AICc", logLik = T) 
 
 # ArtTilstede ~ Alder
 plot(Kjønn~Alder, data=mydata)
 plot(Alder~ArtTilstede, data=mydata)
 
-#### A og B ####
-m1gHoldning <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_1sums, mydata, Hess =T)
-m5b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11, mydata, Hess =T)
+# ArtTilstede ~ q2_11.1 
+plot(ArtTilstede~q2_11.1, data=mydata)
+m7e <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + ArtTilstede:q2_11.1, mydata, Hess =T)
+bbmle::ICtab(m5b,m7e, type="AICc", logLik = T) 
 
-#### Konklusjon så langt ####
-# Beste model: 
-# m5b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11, mydata, Hess =T)
+
+
+#### A og B ####
+mKomb1 <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_1sums + ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1, mydata, Hess =T)
+mKomb2 <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_1sums + q8_1Utdanning + Alder + Kjønn + q2_11.1, mydata, Hess =T)
+mKomb3 <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_1sums + ArtTilstede + Alder + Kjønn + q2_11.1, mydata, Hess =T)
+mKomb4 <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_1sums + ArtTilstede + q8_1Utdanning + Kjønn + q2_11.1, mydata, Hess =T)
+mKomb5 <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_1sums + ArtTilstede + q8_1Utdanning + Alder + q2_11.1, mydata, Hess =T)
+mKomb6 <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_1sums + ArtTilstede + q8_1Utdanning + Alder + Kjønn, mydata, Hess =T)
+mKomb7 <- polr(q4_10~ q4_3 + q4_2 + q3_1sums + ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1, mydata, Hess =T)
+mKomb8 <- polr(q4_10~ q4_3 + q4_2 + q4_7 + ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1, mydata, Hess =T)
+mKomb9 <- polr(q4_10~ q4_3 + q4_7 + q3_1sums + ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1, mydata, Hess =T)
+mKomb10 <- polr(q4_10~ q4_2 + q4_7 + q3_1sums + ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1, mydata, Hess =T)
+mKomb11 <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_1sums + ArtTilstede + q8_1Utdanning + q2_11.1, mydata, Hess =T)
+mKomb12 <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_1sums + q8_1Utdanning + Alder + q2_11.1, mydata, Hess =T)
+# QUESTION: Blir ikke bedre om jeg fjerner en variabel. Så da er vel den mest beskrivende modellen som kan lages for både A og B den modellen som
+# inkluderer alle variablene her?
+
+bbmle::ICtab(m1gHoldning,m5b,mKomb1,mKomb2,mKomb3,mKomb4,mKomb5,mKomb6,mKomb7,mKomb8,mKomb9,mKomb10,mKomb11,mKomb12, type="AICc", logLik = T) 
+
+
+# Interaksjoner i kombinasjon A og B?
+# ArtTilstede ~ Alder
+plot(q3_1sums~Alder, data=mydata)
+plot(Alder~q3_1sums, data=mydata)
+m7c <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 +q3_1sums + Alder:q3_1sums, mydata, Hess =T)
+m7d <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + q3_1sums, mydata, Hess =T)
+bbmle::ICtab(m5b,m7c,m7d, type="AICc", logLik = T) 
+
+
 
 # - Til vurdering: Vi kunne ha testet for effekten av q2_9 også (frykt). Kan gjøre dette ved å summere, slik som vi gjorde for q3_1?
