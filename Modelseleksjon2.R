@@ -13,6 +13,7 @@ library(reshape2)
 library(tidyverse)
 library(lattice)
 library(bbmle)
+library(plyr)
 
 
 #### FACTORS ++ ####
@@ -45,10 +46,12 @@ RovviltsituasjonN<-mydata[,c("RESPID",c("q3_1a","q3_1b", "q3_1c", "q3_1d") )]
 mydata$q3_1sums <- rowSums(RovviltsituasjonN[2:5], na.rm=FALSE)
 head(mydata)
 
-
+lapply(mydata[,c("q4_10","q3_1sums","q4_2","q4_3","q4_7")],table)
+lapply(dat[,c("apply", "pared", "public")], table)
 
 #### A: Test "Synsing" ####
-
+mydataA <- mydata[,c("q4_10","q4_1","q4_2","q4_3","q4_4","q4_5","q4_6","q4_7","q3_1sums")]
+head(mydataA)
 ### i) Test tillit forskning - forklare tillit til rovviltforskning relatert til tillt forskere og forskning
 # Forklaring på variablene
 # 1= forskning er viktig
@@ -95,6 +98,7 @@ bbmle::ICtab(m2,m2a,m2b, type="AICc", logLik = T)
 
 ### ii) Sos Demografi
 mydata$Kjønn <- as.factor(mydata$Kjønn)
+mydata$q8_1Utdanning[mydata$q8_1Utdanning==5]<-4
 mydata$q8_1Utdanning <- as.factor(mydata$q8_1Utdanning)
 m4a <- polr(q4_10~ ArtTilstede + Alder, mydata, Hess =T) 
 m4b <- polr(q4_10~ ArtTilstede + Kjønn, mydata, Hess =T)
@@ -113,7 +117,7 @@ m5a <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_10, mydata,
 m5b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1, mydata, Hess =T) # Bedre
 bbmle::ICtab(m4d,m5a,m5b, type="AICc", logLik = T) 
 #m5b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11, mydata, Hess =T) # Best av disse
-# QUESTION: modellen blir bedre, men kan vi inkludere q2_11.1 som den er?
+
 
 
 ### iv) Beitedyr
@@ -132,6 +136,78 @@ m6b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1 + TapS
 bbmle::ICtab(m5b,m6a,m6b, type="AICc", logLik = T) 
 # Beslutning: Behold m5b. 
 
+#### B - TOLKNING  ####
+mydataB <- mydata[,c("q4_10","ArtTilstede","Alder","Kjønn","q8_1Utdanning","q2_11.1")]
+head(mydataB)
+lapply(mydataB[, c("q4_10","ArtTilstede","Alder","Kjønn","q8_1Utdanning","q2_11.1")], table)
+ftable(xtabs(~ q4_10 + ArtTilstede + Kjønn, data = mydataB))
+ftable(xtabs(~ q4_10 + ArtTilstede, data = mydataB))
+
+ftable(xtabs(~ q4_10 + ArtTilstede + q8_1Utdanning, data = mydataB))
+ftable(xtabs(~ ArtTilstede + q8_1Utdanning, data = mydataB))
+
+### BESTE MODEL##
+m5b <- polr(q4_10~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11, mydata, Hess =T) 
+summary(m5b)
+
+## the proportional odds assumption
+sf <- function(y) {
+  c('Y>=1' = qlogis(mean(y >= 1)),
+    'Y>=2' = qlogis(mean(y >= 2)),
+    'Y>=3' = qlogis(mean(y >= 3)),
+    'Y>=4' = qlogis(mean(y >= 4)),
+    'Y>=5' = qlogis(mean(y >= 5)))
+}
+
+(s <- with(mydata, summary(as.numeric(q4_10) ~ ArtTilstede + q8_1Utdanning + Alder + Kjønn + q2_11.1, fun=sf)))
+
+glm(I(as.numeric(q4_10) >= 2) ~ ArtTilstede, family="binomial", data = mydata)
+glm(I(as.numeric(q4_10) >= 3) ~ ArtTilstede, family="binomial", data = mydata)
+glm(I(as.numeric(q4_10) >= 4) ~ ArtTilstede, family="binomial", data = mydata)
+glm(I(as.numeric(q4_10) >= 5) ~ ArtTilstede, family="binomial", data = mydata)
+summary(s)
+
+s[, 6] <- s[, 6] - s[, 3]
+s[, 5] <- s[, 5] - s[, 3]
+s[, 4] <- s[, 4] - s[, 3]
+s[, 3] <- s[, 3] - s[, 3]
+plot(s, which=1:5, pch=1:5, xlab='logit', main=' ', xlim=range(s[,3:6]))
+
+unique(mydata$Kjønn)
+
+mydata$ArtTilstede<-revalue(mydata$ArtTilstede, c("Ja"="1", "Nei"="0"))
+
+newdat <- data.frame(
+  ArtTilstede = rep(0:1, 200),
+  q8_1Utdanning = rep(1:4, each = 50),
+  Kjønn = rep(1:2, each = 200),
+  q2_11.1 = rep(0:1, each = 200),
+  Alder = rep(seq(from = 13, to = 92, length.out = 100)))
+
+newdat <- data.frame(
+  ArtTilstede = rep(0:1, 200),
+  q8_1Utdanning = rep(1:5, each = 40),
+  Kjønn = rep(1:2, each = 200),
+  q2_11.1 = rep(0:1, each = 200),
+  Alder = rep(13:92, each = 200))
+
+
+newdat <- data.frame(
+  ArtTilstede = rep(0:1, 200),
+  q8_1Utdanning = rep(0:1, each = 200),
+  Kjønn = rep(0:1, each = 200),
+  q2_11.1 = rep(0:1, each = 200),
+  Alder = rep(seq(from = 13, to = 92, length.out = 100),by=0.5, 92))
+
+newdat <- cbind(newdat, predict(m5b, newdat, type = "probs"))
+
+head(newdat)
+#
+ctable <- coef(summary(m5b))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(m5b))
+# confint.default(m5b)
 
 
 
@@ -178,6 +254,9 @@ mKomb12 <- polr(q4_10~ q4_3 + q4_2 + q4_7 + q3_1sums + q8_1Utdanning + Alder + q
 
 bbmle::ICtab(m1gHoldning,m5b,mKomb1,mKomb2,mKomb3,mKomb4,mKomb5,mKomb6,mKomb7,mKomb8,mKomb9,mKomb10,mKomb11,mKomb12, type="AICc", logLik = T) 
 
+#### A og B og AB ####
+
+bbmle::ICtab(m1gHoldning,m5b,mKomb1, type="AICc", logLik = T)
 
 # Interaksjoner i kombinasjon A og B?
 # ArtTilstede ~ Alder
